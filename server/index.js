@@ -21,22 +21,36 @@ app.use(morgan('dev'))
 io.on('connection', (socket) => {
     console.log('user connected', socket.id)
     connections++
+
     socket.emit('newConnection', { connections, id: socket.id })
-    socket.broadcast.emit('newUser', {
-        user: `user "${socket.id}" joined`,
-        connections
+    socket.on('username', (username) => {
+        console.log(username);
+        socket.username = username
+
+        socket.broadcast.emit('userUpdate', {
+            update: {
+                message: `${socket.username} joined`,
+                from: 'system'
+            },
+            connections
+        })
     })
+
 
     socket.on('newMessage', (message) => {
         console.log(message);
-        socket.emit('newMessage', { message, from: socket.id })
-        socket.broadcast.emit('newMessage', { message, from: socket.id })
+        socket.emit('newMessage', { message, from: socket.username, id: socket.id })
+        socket.broadcast.emit('newMessage', { message, from: socket.username, id: socket.id })
     })
 
     socket.on('disconnect', () => {
+        console.log('user disconnected', socket.id)
         connections--
-        socket.broadcast.emit('newUser', {
-            user: `user "${socket.id}" left`,
+        socket.broadcast.emit('userUpdate', {
+            update: {
+                message: `${socket.username} left the chat`,
+                from: 'system'
+            },
             connections
         })
     })

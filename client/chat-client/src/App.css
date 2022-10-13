@@ -4,3 +4,32 @@
   padding: 2rem;
   text-align: center;
 }
+
+.chat-container {
+    display: flex;
+    flex-direction: column;
+    height: 50vh;
+    width: 60vw;
+    min-width: 450px;
+    border: 1px solid #FFFFFF;
+    overflow-y: scroll;
+}
+.message {
+    text-align: left;
+    max-width: 80%;
+    min-width: 30%;
+    color: rgb(255, 255, 255);
+    border: #FFFFFF solid 1px;
+}
+.user-message {
+    max-width: 80%;
+    min-width: 30%;
+    text-align: left;
+    align-self: flex-end;
+    color: rgb(255, 255, 255);
+    border: #07ffa8 solid 1px;
+}
+.sys-message {
+    width: 100%;
+    color: rgb(128, 128, 128);
+}

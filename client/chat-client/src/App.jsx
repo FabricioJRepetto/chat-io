@@ -1,54 +1,41 @@
 import React, { useState, useEffect } from 'react'
 import io from 'socket.io-client'
 import { BACK_URL } from './constants'
+import ChatContainer from './components/ChatContainer'
 
 import './App.css'
+import UsernameInput from './components/UsernameInput'
 
 // se conecta al socket
 const socket = io(BACK_URL)
 
 function App() {
+    const [logged, setLogged] = useState(false)
     const [myId, setMyId] = useState(null)
+    const [username, setUsername] = useState('')
     const [usersOnline, setUsersOnline] = useState(0)
-    const [newUser, setNewUser] = useState('')
     const [message, setMessage] = useState('')
     const [chatBody, setChatBody] = useState([{
         message: 'Welcome to the chat!',
         from: 'system'
     }])
 
+    // importante utilizar una cb para setear los mensajes
+    //? https://stackoverflow.com/questions/70671831/react-socket-io-not-displaying-latest-message-passed-down-as-prop
     const handleNewMessage = (m) => {
-        // importante utilizar una cb para setear los mensajes
-        // https://stackoverflow.com/questions/70671831/react-socket-io-not-displaying-latest-message-passed-down-as-prop
-        setChatBody(prev => [...prev, m])    
+        console.log(m);
+        setChatBody(prev => [...prev, m])
     }
 
-    const handleNewConnection = (c) => { 
-        console.log(c)
+    const handleNewConnection = (c) => {
         setMyId(c.id)
         setUsersOnline(c.connections)
     }
 
-    const handleNewUser = (u) => { 
-        console.log(u);
-        setNewUser(u.user)
+    const handleUserUpdate = (u) => {
+        setChatBody(prev => [...prev, u.update])
         setUsersOnline(u.connections)
     }
-
-
-    useEffect(() => {
-        socket.on('newConnection', (c) => handleNewConnection(c))
-        socket.on('newUser', (u) => handleNewUser(u))
-        socket.on('newMessage', (m) => handleNewMessage(m))
-        
-        return () => {
-            socket.off('newUser')
-            socket.off('newConnection')
-            socket.off('newMessage')
-        }
-        // dependencias deben estar vacías según documentación de socket.io
-    }, [])
-    
 
     const handleSend = (e) => { 
         e.preventDefault()
@@ -56,30 +43,49 @@ function App() {
             socket.emit('newMessage', message)
             setMessage('')
         }
-     }
+    }
+
+    const handleUsername = (e) => { 
+        e.preventDefault()
+        if (username && username.length < 10) {
+            socket.emit('username', username)
+            setUsername('')
+            setLogged(true)
+        }
+    }
+
+    useEffect(() => {
+        socket.on('newConnection', (c) => handleNewConnection(c))
+        socket.on('userUpdate', (u) => handleUserUpdate(u))
+        socket.on('newMessage', (m) => handleNewMessage(m))
+        
+        return () => {
+            socket.off('userUpdate')
+            socket.off('newConnection')
+            socket.off('newMessage')
+        }
+        // dependencias deben estar vacías según documentación de socket.io
+    }, [])
 
     return (
         <div className="App">
-        <h1>Holiwis mundo</h1>
-        <p>{myId}</p>
-        <p>users online: {usersOnline}</p>
-        <p>{newUser}</p>
+            <h1>Chat Socket.io</h1>
+            <p>users online: {usersOnline}</p>
+            
+            <div>{
+                !logged
+                ? <UsernameInput 
+                    handleUsername={handleUsername}
+                    username={username}
+                    setUsername={setUsername}/>
+                : <ChatContainer 
+                    myId={myId}
+                    chatBody={chatBody}
+                    message={message}
+                    handleSend={handleSend}
+                    setMessage={setMessage}/>
+            }</div>
 
-        <div>
-            {chatBody.length &&
-                chatBody.map((m, index) => (
-                    <p key={index}>
-                        <b>{m.from !== myId ? `${m.from} : ` : 'Me: '}</b>
-                        {m.message}
-                    </p>
-                ))                
-            }
-        </div>
-
-        <form onSubmit={handleSend}>
-            <input type="text" placeholder='type a message' onChange={e => setMessage(e.target.value)} value={message}/>
-            <button onClick={handleSend}>send</button>
-        </form>
         </div>
     )
 }
