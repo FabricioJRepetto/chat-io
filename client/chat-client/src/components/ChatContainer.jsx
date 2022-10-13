@@ -4,7 +4,7 @@ const ChatContainer = (props) => {
     const {
         chatBody, 
         message, 
-        myId, 
+        myId,
         handleSend, 
         handleIsTyping,
         userTyping
@@ -25,7 +25,7 @@ const ChatContainer = (props) => {
                             : m.id === myId
                             ? 'user-message'
                             : 'message'}>
-                            <b>{(m.from === 'system' || m.id === myId) 
+                            <b style={{color: m.color}}>{(m.from === 'system' || m.id === myId) 
                                 ? '' 
                                 : `${m.from}: `}</b>
                             {m.message}

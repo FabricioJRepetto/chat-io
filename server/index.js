@@ -11,9 +11,21 @@ const app = express(),
         cors: {
             origin: '*'
         }
-    })
+    }),
+    COLORS = [
+        '#F94144',
+        '#F3722C',
+        '#F8961E',
+        '#F9844A',
+        '#F9C74F',
+        '#90BE6D',
+        '#43AA8B',
+        '#4D908E',
+        '#577590',
+        '#277DA1'
+    ]
 
-let connections = 0,
+let usersOnline = [],
     lastTyping = 0,
     typing = false
 
@@ -22,14 +34,19 @@ app.use(morgan('dev'))
 
 io.on('connection', (socket) => {
     console.log('user connected', socket.id)
-    connections++
+    socket.emit('newConnection', { usersOnline, id: socket.id })
 
-    socket.emit('newConnection', { connections, id: socket.id })
-    socket.broadcast.emit('connectionsUpdate', { connections })
-
+    //? CONNECTIONS
+    // solo cuando el usuario elije un nickname
+    // se muestra la conección y el mensaje
     socket.on('username', (username) => {
-        console.log(username);
+        let random = Math.floor(Math.random() * 9.9)
         socket.username = username
+        socket.color = COLORS[random]
+        usersOnline.push({ user: username, id: socket.id, color: COLORS[random] })
+
+        socket.emit('newConnection', { usersOnline, id: socket.id })
+        socket.broadcast.emit('connectionsUpdate', { usersOnline })
 
         socket.broadcast.emit('newMessage', {
             message: `${socket.username} joined`,
@@ -37,25 +54,29 @@ io.on('connection', (socket) => {
         })
     })
 
-
+    //? MESSAGES
     socket.on('newMessage', (message) => {
-        console.log(message);
-        socket.emit('newMessage', { message, from: socket.username, id: socket.id })
-        socket.broadcast.emit('newMessage', { message, from: socket.username, id: socket.id })
+        socket.emit('newMessage', { message, from: socket.username, id: socket.id, color: socket.color })
+        socket.broadcast.emit('newMessage', { message, from: socket.username, id: socket.id, color: socket.color })
     })
 
+    //? IS TYPING
     socket.on('isTyping', () => {
         lastTyping = Date.now()
+        // esta variable sirve para saber si el usuario presionó enter (aka dejó de typear)
         typing = true
         socket.broadcast.emit('userTyping', socket.username)
+        // tambien ejecuta el watcher
         StopTypingWatcher();
     })
+    // si el usuario presiona enter, se quita el "is typing" sin esperar el timeout
     socket.on('isNotTyping', () => {
         typing = false
         socket.broadcast.emit('userStopTyping')
     })
-
     const StopTypingWatcher = () => {
+        // despues de 2 seg comprueba si pasó 1 seg desde el ultimo typeo
+        // si es true Y la variable typing también, quita el "is typing"
         setTimeout(() => {
             let aux = Date.now() - lastTyping
             if (aux > 1000 && typing) {
@@ -65,15 +86,15 @@ io.on('connection', (socket) => {
         }, 2000);
     }
 
+    //? DISCONNECT
     socket.on('disconnect', () => {
         console.log('user disconnected', socket.id)
-        connections--
-        socket.broadcast.emit('userUpdate', {
-            update: {
-                message: `${socket.username} left the chat`,
-                from: 'system'
-            },
-            connections
+        usersOnline = usersOnline.filter(u => u.id !== socket.id)
+
+        socket.broadcast.emit('connectionsUpdate', { usersOnline })
+        socket.broadcast.emit('newMessage', {
+            message: `${socket.username} letf the chat`,
+            from: 'system'
         })
     })
 

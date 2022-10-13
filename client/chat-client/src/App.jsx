@@ -13,7 +13,7 @@ function App() {
     const logged = useRef(false)
     const [myId, setMyId] = useState(null)
     const [username, setUsername] = useState('')
-    const [usersOnline, setUsersOnline] = useState(0)
+    const [usersOnline, setUsersOnline] = useState([])
     const [userTyping, setUserTyping] = useState(false)
     const [message, setMessage] = useState('')
     const [chatBody, setChatBody] = useState([{
@@ -31,11 +31,11 @@ function App() {
 
     const handleNewConnection = (c) => {
         setMyId(c.id)
-        setUsersOnline(c.connections)
+        setUsersOnline(c.usersOnline)
     }
 
     const handleConnectionsUpdate = (u) => {
-        setUsersOnline(u.connections)
+        setUsersOnline(u.usersOnline)
     }
 
     const handleSend = (e) => { 
@@ -61,15 +61,13 @@ function App() {
     }
      
     const handleIsTyping = (e) => {
-        // e.preventDefault()
         setMessage(e.target.value)
-        // mostrar "is typing"
         socket.emit('isTyping')
     }
 
     useEffect(() => {
-        socket.on('connectionsUpdate', (u) => handleConnectionsUpdate(u))
         socket.on('newConnection', (c) => handleNewConnection(c))
+        socket.on('connectionsUpdate', (u) => handleConnectionsUpdate(u))
         socket.on('newMessage', (m) => handleNewMessage(m, logged))
         socket.on('userTyping', (u) => handleUserTyping(u))
         socket.on('userStopTyping', () => setUserTyping(false))
@@ -87,7 +85,15 @@ function App() {
     return (
         <div className="App">
             <h1>Chat Socket.io</h1>
-            <p>Total users online: {usersOnline}</p>
+            <p>Users online: {usersOnline.length || 0}</p>
+
+            <ul>
+                {usersOnline.length &&
+                    usersOnline.map(u => (
+                        <li key={u.id}>{u.user}</li>
+                    ))
+                }
+            </ul>
 
             <div>{
                 !logged.current
