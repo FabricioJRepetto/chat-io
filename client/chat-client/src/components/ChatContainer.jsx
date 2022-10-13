@@ -6,7 +6,8 @@ const ChatContainer = (props) => {
         message, 
         myId, 
         handleSend, 
-        setMessage
+        handleIsTyping,
+        userTyping
     } = props
 
     useEffect(() => {
@@ -15,7 +16,7 @@ const ChatContainer = (props) => {
     }, [chatBody])
 
     return (
-        <div>
+        <div>            
             <div className='chat-container' id='chat-container'>
                 {chatBody.length &&
                     chatBody.map((m, index) => (
@@ -33,8 +34,13 @@ const ChatContainer = (props) => {
                 }
             </div>
 
+            {userTyping && <p>{userTyping} is typing...</p>}
+
             <form onSubmit={handleSend}>
-                <input type="text" placeholder='type a message' onChange={e => setMessage(e.target.value)} value={message}/>
+                <input type="text" 
+                    placeholder='type a message' 
+                    onChange={handleIsTyping} 
+                    value={message}/>
                 <button onClick={handleSend}>send</button>
             </form>
         </div>

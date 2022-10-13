@@ -13,7 +13,9 @@ const app = express(),
         }
     })
 
-let connections = 0
+let connections = 0,
+    lastTyping = 0,
+    typing = false
 
 app.use(cors())
 app.use(morgan('dev'))
@@ -23,16 +25,15 @@ io.on('connection', (socket) => {
     connections++
 
     socket.emit('newConnection', { connections, id: socket.id })
+    socket.broadcast.emit('connectionsUpdate', { connections })
+
     socket.on('username', (username) => {
         console.log(username);
         socket.username = username
 
-        socket.broadcast.emit('userUpdate', {
-            update: {
-                message: `${socket.username} joined`,
-                from: 'system'
-            },
-            connections
+        socket.broadcast.emit('newMessage', {
+            message: `${socket.username} joined`,
+            from: 'system'
         })
     })
 
@@ -42,6 +43,27 @@ io.on('connection', (socket) => {
         socket.emit('newMessage', { message, from: socket.username, id: socket.id })
         socket.broadcast.emit('newMessage', { message, from: socket.username, id: socket.id })
     })
+
+    socket.on('isTyping', () => {
+        lastTyping = Date.now()
+        typing = true
+        socket.broadcast.emit('userTyping', socket.username)
+        StopTypingWatcher();
+    })
+    socket.on('isNotTyping', () => {
+        typing = false
+        socket.broadcast.emit('userStopTyping')
+    })
+
+    const StopTypingWatcher = () => {
+        setTimeout(() => {
+            let aux = Date.now() - lastTyping
+            if (aux > 1000 && typing) {
+                socket.broadcast.emit('userStopTyping')
+                typing = false
+            }
+        }, 2000);
+    }
 
     socket.on('disconnect', () => {
         console.log('user disconnected', socket.id)

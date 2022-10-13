@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import io from 'socket.io-client'
 import { BACK_URL } from './constants'
 import ChatContainer from './components/ChatContainer'
@@ -10,21 +10,23 @@ import UsernameInput from './components/UsernameInput'
 const socket = io(BACK_URL)
 
 function App() {
-    const [logged, setLogged] = useState(false)
+    const logged = useRef(false)
     const [myId, setMyId] = useState(null)
     const [username, setUsername] = useState('')
     const [usersOnline, setUsersOnline] = useState(0)
+    const [userTyping, setUserTyping] = useState(false)
     const [message, setMessage] = useState('')
     const [chatBody, setChatBody] = useState([{
         message: 'Welcome to the chat!',
         from: 'system'
     }])
-
+    
     // importante utilizar una cb para setear los mensajes
     //? https://stackoverflow.com/questions/70671831/react-socket-io-not-displaying-latest-message-passed-down-as-prop
     const handleNewMessage = (m) => {
-        console.log(m);
-        setChatBody(prev => [...prev, m])
+        if (logged.current) {
+            setChatBody(prev => [...prev, m])            
+        }
     }
 
     const handleNewConnection = (c) => {
@@ -32,8 +34,7 @@ function App() {
         setUsersOnline(c.connections)
     }
 
-    const handleUserUpdate = (u) => {
-        setChatBody(prev => [...prev, u.update])
+    const handleConnectionsUpdate = (u) => {
         setUsersOnline(u.connections)
     }
 
@@ -41,28 +42,44 @@ function App() {
         e.preventDefault()
         if (message.length) {
             socket.emit('newMessage', message)
+            socket.emit('isNotTyping')
             setMessage('')
         }
     }
 
-    const handleUsername = (e) => { 
+    const handleUsername = (e) => {
         e.preventDefault()
         if (username && username.length < 10) {
             socket.emit('username', username)
             setUsername('')
-            setLogged(true)
+            logged.current = true
         }
     }
 
+    const handleUserTyping = (u) => {
+        setUserTyping(u || false);
+    }
+     
+    const handleIsTyping = (e) => {
+        // e.preventDefault()
+        setMessage(e.target.value)
+        // mostrar "is typing"
+        socket.emit('isTyping')
+    }
+
     useEffect(() => {
+        socket.on('connectionsUpdate', (u) => handleConnectionsUpdate(u))
         socket.on('newConnection', (c) => handleNewConnection(c))
-        socket.on('userUpdate', (u) => handleUserUpdate(u))
-        socket.on('newMessage', (m) => handleNewMessage(m))
+        socket.on('newMessage', (m) => handleNewMessage(m, logged))
+        socket.on('userTyping', (u) => handleUserTyping(u))
+        socket.on('userStopTyping', () => setUserTyping(false))
         
         return () => {
-            socket.off('userUpdate')
+            socket.off('connectionsUpdate')
             socket.off('newConnection')
             socket.off('newMessage')
+            socket.off('userTyping')
+            socket.off('userStopTyping')
         }
         // dependencias deben estar vacías según documentación de socket.io
     }, [])
@@ -70,10 +87,10 @@ function App() {
     return (
         <div className="App">
             <h1>Chat Socket.io</h1>
-            <p>users online: {usersOnline}</p>
-            
+            <p>Total users online: {usersOnline}</p>
+
             <div>{
-                !logged
+                !logged.current
                 ? <UsernameInput 
                     handleUsername={handleUsername}
                     username={username}
@@ -83,7 +100,8 @@ function App() {
                     chatBody={chatBody}
                     message={message}
                     handleSend={handleSend}
-                    setMessage={setMessage}/>
+                    handleIsTyping={handleIsTyping}
+                    userTyping={userTyping}/>
             }</div>
 
         </div>
