@@ -60,6 +60,11 @@ io.on('connection', (socket) => {
         socket.broadcast.emit('newMessage', { message, from: socket.username, id: socket.id, color: socket.color })
     })
 
+    //? PRIVATE MESSAGE
+    socket.on('privateMessage', (payload) => {
+        socket.to(payload.to).emit('privateMessage', { userId: socket.id, from: socket.username, message: payload.message })
+    })
+
     //? IS TYPING
     socket.on('isTyping', () => {
         lastTyping = Date.now()
