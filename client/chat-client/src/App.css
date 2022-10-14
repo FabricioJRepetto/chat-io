@@ -29,6 +29,9 @@
     color: rgb(255, 255, 255);
     border: #07ffa8 solid 1px;
 }
+.private-message {
+    background-color: #000000;
+}
 .sys-message {
     width: 100%;
     color: rgb(128, 128, 128);

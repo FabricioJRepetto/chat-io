@@ -62,7 +62,7 @@ io.on('connection', (socket) => {
 
     //? PRIVATE MESSAGE
     socket.on('privateMessage', (payload) => {
-        socket.to(payload.to).emit('privateMessage', { userId: socket.id, from: socket.username, message: payload.message })
+        socket.to(payload.to).emit('privateMessage', { id: socket.id, from: socket.username, message: payload.message, color: socket.color, private: true })
     })
 
     //? IS TYPING

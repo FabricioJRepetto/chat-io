@@ -7,6 +7,7 @@ const ChatContainer = (props) => {
         myId,
         handleSend, 
         handleIsTyping,
+        handleOpenInbox,
         userTyping
     } = props
 
@@ -15,17 +16,22 @@ const ChatContainer = (props) => {
         element.scrollTop = element.scrollHeight;
     }, [chatBody])
 
+    const handlePrivate = (id, name) => {
+        handleOpenInbox({ id, name })
+     }
+
     return (
         <div>            
             <div className='chat-container' id='chat-container'>
                 {chatBody.length &&
                     chatBody.map((m, index) => (
-                        <p key={index} className={m.from === 'system'
+                        <p key={index} className={`${m.from === 'system'
                             ? 'sys-message'
                             : m.id === myId
                             ? 'user-message'
-                            : 'message'}>
-                            <b style={{color: m.color}}>{(m.from === 'system' || m.id === myId) 
+                            : 'message'}
+                            ${m.private && 'private-message'}`}>
+                            <b onClick={() => handlePrivate(m.id, m.from)} style={{color: m.color}}>{(m.from === 'system' || m.id === myId) 
                                 ? '' 
                                 : `${m.from}: `}</b>
                             {m.message}
