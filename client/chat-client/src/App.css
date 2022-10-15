@@ -5,6 +5,11 @@
   text-align: center;
 }
 
+.container {
+    display: flex;
+    
+}
+
 .chat-container {
     display: flex;
     flex-direction: column;
@@ -30,7 +35,7 @@
     border: #07ffa8 solid 1px;
 }
 .private-message {
-    background-color: #000000;
+    background-color: #101010;
 }
 .sys-message {
     width: 100%;
