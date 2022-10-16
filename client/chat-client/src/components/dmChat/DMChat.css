@@ -1,0 +1,10 @@
+.dm-chat-body {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid lime;
+}
+
+.dm-chat-content {
+    display: flex;
+    flex-direction: column;
+}

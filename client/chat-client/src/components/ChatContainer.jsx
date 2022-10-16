@@ -25,15 +25,17 @@ const ChatContainer = (props) => {
             <div className='chat-container' id='chat-container'>
                 {chatBody.length &&
                     chatBody.map((m, index) => (
-                        <p key={index} className={`${m.from === 'system'
-                            ? 'sys-message'
-                            : m.id === myId
-                                ? 'user-message'
-                                : 'message'}
-                            ${m.private && 'private-message'}`}>
-                            <b onClick={() => handlePrivate(m.id, m.from)} style={{ color: m.color }}>{(m.from === 'system' || m.id === myId)
-                                ? ''
-                                : `${m.private ? 'dm from ' : ''} ${m.from}: `}</b>
+                        <p key={index}
+                            className={m.from === 'system'
+                                ? 'sys-message'
+                                : m.id === myId
+                                    ? 'user-message'
+                                    : 'message'}>
+                            <b onClick={() => handlePrivate(m.id, m.from)}
+                                style={{ color: m.color }}>
+                                {(m.from === 'system' || m.id === myId)
+                                    ? ''
+                                    : m.from + ': '}</b>
                             {m.message}
                         </p>
                     ))

@@ -4,6 +4,7 @@ import { BACK_URL } from './constants'
 import ChatContainer from './components/ChatContainer'
 import UsernameInput from './components/UsernameInput'
 import Contacts from './components/contacts/Contacts'
+import DMChat from './components/dmChat/DMChat'
 import { useCon } from './context'
 
 import './App.css'
@@ -13,7 +14,7 @@ const socket = io(BACK_URL)
 
 function App() {
     const logged = useRef(false)
-    const [myId, setMyId] = useState(null)
+    const myId = useRef(false)
     const [username, setUsername] = useState('')
     const [userTyping, setUserTyping] = useState(false)
     const [message, setMessage] = useState('')
@@ -21,11 +22,9 @@ function App() {
         message: 'Welcome to the chat!',
         from: 'system'
     }])
-    const [privateMessage, setPrivateMessage] = useState('')
     const [selectedUser, setSelectedUser] = useState(false)
-    const [inboxes, setInboxes] = useState(new Map())
 
-    const { dispatch, state: { users } } = useCon()
+    const { dispatch, state: { users, inboxes, dmChat } } = useCon()
 
     // importante utilizar una cb para setear los mensajes
     //? https://stackoverflow.com/questions/70671831/react-socket-io-not-displaying-latest-message-passed-down-as-prop
@@ -36,7 +35,7 @@ function App() {
     }
 
     const handleNewConnection = (c) => {
-        setMyId(c.id)
+        myId.current = c.id
         dispatch({ type: 'update', payload: c.usersOnline })
     }
 
@@ -63,7 +62,7 @@ function App() {
     }
 
     const handleUserTyping = (u) => {
-        setUserTyping(u || false);
+        setUserTyping(u || false)
     }
 
     const handleIsTyping = (e) => {
@@ -71,38 +70,76 @@ function App() {
         socket.emit('isTyping')
     }
 
-    const handleSendPrivate = (e) => {
-        e.preventDefault()
+    const handleSendPrivate = (data) => {
         socket.emit('privateMessage', {
-            message: privateMessage,
-            to: selectedUser.id
+            message: data.message,
+            to: data.to
         })
-        setPrivateMessage('')
     }
 
-    const handleOpenInbox = (payload) => {
-        setSelectedUser({ name: payload.name, id: payload.id })
+    const handleOpenInbox = ({ id, name }) => {
+        try {
+            let aux = inboxes
+            if (!aux.has(id)) aux.set(id, { name, messages: [] })
+            dispatch({ type: 'newInbox', payload: aux })
+            setSelectedUser({ name, id })
+        } catch (err) {
+            console.log(err);
+        }
     }
 
-    const handleNewInbox = (d) => {
+    const handleNewInbox = (m) => {
         // Al ser una callback e intentar acceder al estado mediante el hook useState
         // obtengo el valor por defecto
         // (sin importar que se haya actualizado antes)
         // Si utilizamos setState obtenemos el valor actualizado...
         // También se podría utilizar useRef en su lugar
         //? https://stackoverflow.com/questions/57847594/react-hooks-accessing-up-to-date-state-from-within-a-callback
-        setInboxes(current => {
-            let aux = current
+        // setInboxes(current => {
+        //     let aux = current
+        //     // si soy el emisor...
+        //     if (d.id === myId.current) aux.get(d.to).messages.push(d)
+        //     else { // si soy el receptor...
+        //         if (aux.has(d.id)) aux.get(d.id).messages.push(d)
+        //         else aux.set(d.id, { messages: [d], name: d.from })
+        //     }
+        //     return aux
+        // })
 
-            if (d.id === myId) { // si soy el emisor, utilizo 'to' para crear la conversación
-                if (aux.has(d.to)) aux.get(d.to).push(d)
-                else aux.set(d.to, [d])
-            } else { // si soy el receptor...
-                if (aux.has(d.id)) aux.get(d.id).push(d)
-                else aux.set(d.id, [d])
+        try {
+            // si el destinatario soy yo, abro el chat
+            if (m.to.id === myId.current) {
+                setSelectedUser({ id: m.from.id, name: m.from.name })
+                let newDmChat = { ...dmChat, [m.from.id]: false }
+                dispatch({ type: 'dmTyping', newDmChat })
             }
-            return aux
-        })
+
+            let aux = inboxes
+
+            // si soy el emisor...
+            if (m.from.id === myId.current) {
+                aux.get(m.to.id).messages.push(m)
+            } else { // si soy el receptor...
+                if (aux.has(m.from.id)) {
+                    aux.get(m.from.id).messages.push(m)
+                } else {
+                    aux.set(m.from.id, { messages: [m], name: m.from.name })
+                }
+            }
+
+            dispatch({ type: 'newInbox', payload: aux })
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
+    const handleDMTyping = ({ id, typing }) => {
+        try {
+            let newDmChat = { ...dmChat, [id]: typing }
+            dispatch({ type: 'dmTyping', payload: newDmChat })
+        } catch (err) {
+            console.log(err);
+        }
     }
 
     useEffect(() => {
@@ -111,6 +148,8 @@ function App() {
         socket.on('newMessage', (m) => handleNewMessage(m, logged))
         socket.on('userTyping', (u) => handleUserTyping(u))
         socket.on('userStopTyping', () => setUserTyping(false))
+        socket.on('DMisTyping', (data) => handleDMTyping(data))
+        socket.on('DMStopTyping', (data) => handleDMTyping(data))
         socket.on('privateMessage', (d) => handleNewInbox(d))
 
         return () => {
@@ -120,6 +159,8 @@ function App() {
             socket.off('userTyping')
             socket.off('userStopTyping')
             socket.off('privateMessage')
+            socket.off('DMisTyping')
+            socket.off('DMStopTyping')
         }
         // dependencias deben estar vacías según documentación de socket.io
         // eslint-disable-next-line
@@ -129,7 +170,9 @@ function App() {
         <div className="App">
             <h1>Chat Socket.io</h1>
             <p>Users online: {users.length || 0}</p>
-            <p>{myId}</p>
+            <p>{myId.current}</p>
+            <button onClick={() => console.log(myId.current)}>ID</button>
+            <button onClick={() => console.log(inboxes)}>inbox</button>
 
             <div>{
                 !logged.current
@@ -138,9 +181,8 @@ function App() {
                         username={username}
                         setUsername={setUsername} />
                     : <div className='container'>
-                        <Contacts myId={myId} />
-                        <ChatContainer
-                            myId={myId}
+                        <Contacts myId={myId.current} />
+                        <ChatContainer myId={myId.current}
                             chatBody={chatBody}
                             message={message}
                             handleSend={handleSend}
@@ -150,25 +192,13 @@ function App() {
                     </div>
             }</div>
 
-            {selectedUser && <div className='inboxes'>
-                <p>Private chat with: {selectedUser.name}</p>
-                {/* {inboxes.has(selectedUser.id) && 
-                    <div>{
-                        inboxes.get(selectedUser.id).map(m => (
-                                <p><b>{m.name}: </b>{m.message}</p>
-                            ))
-                    }</div>} */}
-                <form onSubmit={handleSendPrivate}>
-                    <input type="text"
-                        onChange={(e) => setPrivateMessage(e.target.value)}
-                        value={privateMessage} />
-                    <button>@SEND</button>
-                </form>
-            </div>}
-
-            <button onClick={() => console.log(myId)}>ID</button>
-            <button onClick={() => console.log(inboxes)}>inbox</button>
-
+            {selectedUser &&
+                <DMChat key={selectedUser.id + myId.current}
+                    user={selectedUser}
+                    socket={socket}
+                    handleSendPrivate={handleSendPrivate}
+                />
+            }
         </div>
     )
 }

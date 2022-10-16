@@ -1,13 +1,12 @@
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 2rem;
+    text-align: center;
 }
 
 .container {
     display: flex;
-    
 }
 
 .chat-container {
@@ -19,24 +18,35 @@
     border: 1px solid #FFFFFF;
     overflow-y: scroll;
 }
+
 .message {
-    text-align: left;
     max-width: 80%;
     min-width: 30%;
+    text-align: left;
+    align-self: flex-start;
     color: rgb(255, 255, 255);
-    border: #FFFFFF solid 1px;
+    background-color: #303030;
+    border-radius: 0 .5rem .5rem 0;
+    margin: none;
+    padding: .2rem .7rem;
 }
+
+.message b {
+    cursor: pointer;
+}
+
 .user-message {
     max-width: 80%;
     min-width: 30%;
     text-align: left;
     align-self: flex-end;
     color: rgb(255, 255, 255);
-    border: #07ffa8 solid 1px;
+    background-color: #151f2e;
+    border-radius: .5rem 0 0 .5rem;
+    margin: none;
+    padding: .2rem .7rem;
 }
-.private-message {
-    background-color: #101010;
-}
+
 .sys-message {
     width: 100%;
     color: rgb(128, 128, 128);
