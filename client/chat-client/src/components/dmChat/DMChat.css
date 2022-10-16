@@ -2,9 +2,30 @@
     display: flex;
     flex-direction: column;
     border: 1px solid lime;
+    max-height: 2rem;
+    max-width: 20rem;
 }
 
 .dm-chat-content {
     display: flex;
     flex-direction: column;
+}
+
+.dm-expanded {
+    height: 30rem;
+    max-height: 30rem;
+}
+
+.dm-unseen {
+    animation: unseen 2s infinite;
+}
+
+@keyframes unseen {
+    0% {
+        border: 1px solid orange
+    }
+
+    100% {
+        border: 1px solid transparent
+    }
 }

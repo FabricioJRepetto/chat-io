@@ -4,13 +4,13 @@ export const ContextContext = createContext()
 
 function contextReducer(state, action) {
     switch (action.type) {
-        case 'update': {
+        case 'usersUpdate': {
             return { ...state, users: action.payload }
         }
         case 'newInbox': {
             return { ...state, inboxes: action.payload }
         }
-        case 'dmTyping': {
+        case 'chatUpdate': {
             return { ...state, chats: action.payload }
         }
         default: {

@@ -3,7 +3,7 @@ import { useCon } from '../../context'
 
 import './Contacts.css'
 
-const Contacts = ({ myId }) => {
+const Contacts = ({ myId, handleOpenInbox }) => {
     const { state: { users } } = useCon()
     const [usersOnline, setUsersOnline] = useState(false)
 
@@ -16,7 +16,9 @@ const Contacts = ({ myId }) => {
             <h3>Users {users.length}</h3>
             <div>{usersOnline.length > 0
                 ? usersOnline.map(u => (
-                    u.id !== myId && <div key={u.id} >
+                    u.id !== myId &&
+                    <div key={u.id}
+                        onClick={() => handleOpenInbox({ id: u.id, name: u.user })}>
                         <b style={{ color: u.color }}>{u.user}</b>
                     </div>
                 ))

@@ -22,9 +22,9 @@ function App() {
         message: 'Welcome to the chat!',
         from: 'system'
     }])
-    const [selectedUser, setSelectedUser] = useState(false)
+    // const [selectedUser, setSelectedUser] = useState(false)
 
-    const { dispatch, state: { users, inboxes, dmChat } } = useCon()
+    const { dispatch, state: { users, inboxes, chats } } = useCon()
 
     // importante utilizar una cb para setear los mensajes
     //? https://stackoverflow.com/questions/70671831/react-socket-io-not-displaying-latest-message-passed-down-as-prop
@@ -36,11 +36,11 @@ function App() {
 
     const handleNewConnection = (c) => {
         myId.current = c.id
-        dispatch({ type: 'update', payload: c.usersOnline })
+        dispatch({ type: 'usersUpdate', payload: c.usersOnline })
     }
 
     const handleConnectionsUpdate = (u) => {
-        dispatch({ type: 'update', payload: u.usersOnline })
+        dispatch({ type: 'usersUpdate', payload: u.usersOnline })
     }
 
     const handleSend = (e) => {
@@ -82,40 +82,51 @@ function App() {
             let aux = inboxes
             if (!aux.has(id)) aux.set(id, { name, messages: [] })
             dispatch({ type: 'newInbox', payload: aux })
-            setSelectedUser({ name, id })
+
+            let newDmChat = chats || {}
+            newDmChat[id] = {
+                name,
+                open: true,
+                expanded: true,
+                typing: false,
+                unseen: false
+            }
+            console.log(newDmChat);
+            dispatch({ type: 'chatUpdate', payload: newDmChat })
         } catch (err) {
             console.log(err);
         }
     }
 
+    // Al ser una callback e intentar acceder al estado mediante el hook useState
+    // obtengo el valor por defecto (sin importar que se haya actualizado antes)
+    //? https://stackoverflow.com/questions/57847594/react-hooks-accessing-up-to-date-state-from-within-a-callback       
     const handleNewInbox = (m) => {
-        // Al ser una callback e intentar acceder al estado mediante el hook useState
-        // obtengo el valor por defecto
-        // (sin importar que se haya actualizado antes)
-        // Si utilizamos setState obtenemos el valor actualizado...
-        // También se podría utilizar useRef en su lugar
-        //? https://stackoverflow.com/questions/57847594/react-hooks-accessing-up-to-date-state-from-within-a-callback
-        // setInboxes(current => {
-        //     let aux = current
-        //     // si soy el emisor...
-        //     if (d.id === myId.current) aux.get(d.to).messages.push(d)
-        //     else { // si soy el receptor...
-        //         if (aux.has(d.id)) aux.get(d.id).messages.push(d)
-        //         else aux.set(d.id, { messages: [d], name: d.from })
-        //     }
-        //     return aux
-        // })
-
         try {
             // si el destinatario soy yo, abro el chat
+            // y agrego el chat al context
             if (m.to.id === myId.current) {
-                setSelectedUser({ id: m.from.id, name: m.from.name })
-                let newDmChat = { ...dmChat, [m.from.id]: false }
-                dispatch({ type: 'dmTyping', newDmChat })
+                let newDmChat = chats
+                if (chats[m.from.id]) {
+                    newDmChat[m.from.id] = {
+                        ...chats[m.from.id],
+                        open: true,
+                        unseen: true
+                    }
+                } else {
+                    newDmChat[m.from.id] = {
+                        name: m.from.name,
+                        open: true,
+                        expanded: false,
+                        unseen: true,
+                        typing: false
+                    }
+                }
+
+                dispatch({ type: 'chatUpdate', payload: newDmChat })
             }
 
             let aux = inboxes
-
             // si soy el emisor...
             if (m.from.id === myId.current) {
                 aux.get(m.to.id).messages.push(m)
@@ -135,8 +146,14 @@ function App() {
 
     const handleDMTyping = ({ id, typing }) => {
         try {
-            let newDmChat = { ...dmChat, [id]: typing }
-            dispatch({ type: 'dmTyping', payload: newDmChat })
+            if (chats[id]) {
+                let newDmChat = chats
+                newDmChat[id] = {
+                    ...chats[id],
+                    typing
+                }
+                dispatch({ type: 'chatUpdate', payload: newDmChat })
+            }
         } catch (err) {
             console.log(err);
         }
@@ -173,6 +190,7 @@ function App() {
             <p>{myId.current}</p>
             <button onClick={() => console.log(myId.current)}>ID</button>
             <button onClick={() => console.log(inboxes)}>inbox</button>
+            <button onClick={() => console.log(chats)}>chats</button>
 
             <div>{
                 !logged.current
@@ -181,7 +199,8 @@ function App() {
                         username={username}
                         setUsername={setUsername} />
                     : <div className='container'>
-                        <Contacts myId={myId.current} />
+                        <Contacts myId={myId.current}
+                            handleOpenInbox={handleOpenInbox} />
                         <ChatContainer myId={myId.current}
                             chatBody={chatBody}
                             message={message}
@@ -192,12 +211,15 @@ function App() {
                     </div>
             }</div>
 
-            {selectedUser &&
-                <DMChat key={selectedUser.id + myId.current}
-                    user={selectedUser}
-                    socket={socket}
-                    handleSendPrivate={handleSendPrivate}
-                />
+            {(chats) &&
+                Object.entries(chats).map(([k, v]) => (
+                    v.open &&
+                    <DMChat key={k + myId.current}
+                        user={{ id: k, name: v.name }}
+                        socket={socket}
+                        handleSendPrivate={handleSendPrivate}
+                    />
+                ))
             }
         </div>
     )

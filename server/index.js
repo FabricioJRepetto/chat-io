@@ -62,7 +62,27 @@ io.on('connection', (socket) => {
 
     //? PRIVATE MESSAGE
     socket.on('privateMessage', (payload) => {
-        socket.to(payload.to).emit('privateMessage', { id: socket.id, from: socket.username, message: payload.message, color: socket.color, private: true })
+        let aux = {
+            from: {
+                id: socket.id,
+                name: socket.username,
+                color: socket.color,
+            },
+            to: payload.to,
+            message: payload.message,
+            private: true
+        }
+        socket.emit('privateMessage', aux)
+        socket.to(payload.to.id).emit('privateMessage', aux)
+    })
+    socket.on('DMisTyping', (id) => {
+        typing = true
+        socket.to(id).emit('DMisTyping', { id: socket.id, typing: true })
+        StopTypingWatcher(id)
+    })
+    socket.on('DMisNotTyping', (id) => {
+        typing = false
+        socket.to(id).emit('DMStopTyping', { id: socket.id, typing: false })
     })
 
     //? IS TYPING
@@ -77,15 +97,17 @@ io.on('connection', (socket) => {
     // si el usuario presiona enter, se quita el "is typing" sin esperar el timeout
     socket.on('isNotTyping', () => {
         typing = false
-        socket.broadcast.emit('userStopTyping')
+        socket.broadcast.emit('userStopTyping', false)
     })
-    const StopTypingWatcher = () => {
+    const StopTypingWatcher = (id) => {
         // despues de 2 seg comprueba si pasó 1 seg desde el ultimo typeo
         // si es true Y la variable typing también, quita el "is typing"
         setTimeout(() => {
             let aux = Date.now() - lastTyping
             if (aux > 1000 && typing) {
-                socket.broadcast.emit('userStopTyping')
+                id
+                    ? socket.to(id).emit('DMStopTyping', { id: socket.id, typing: false })
+                    : socket.broadcast.emit('userStopTyping')
                 typing = false
             }
         }, 2000);
