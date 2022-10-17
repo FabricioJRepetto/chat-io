@@ -1,14 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react'
+import { Routes, Route, useNavigate } from "react-router-dom";
 import io from 'socket.io-client'
 import { BACK_URL } from './constants'
 import ChatContainer from './components/ChatContainer'
 import UsernameInput from './components/UsernameInput'
 import Contacts from './components/contacts/Contacts'
 import DMChat from './components/dmChat/DMChat'
+import TicTacToe from './components/tictactoe/TicTacToe';
 import { useCon } from './context'
 
 import './App.css'
-
 // se conecta al socket
 const socket = io(BACK_URL)
 
@@ -22,8 +23,7 @@ function App() {
         message: 'Welcome to the chat!',
         from: 'system'
     }])
-    // const [selectedUser, setSelectedUser] = useState(false)
-
+    const navigate = useNavigate()
     const { dispatch, state: { users, inboxes, chats } } = useCon()
 
     // importante utilizar una cb para setear los mensajes
@@ -56,7 +56,7 @@ function App() {
         e.preventDefault()
         if (username && username.length < 15) {
             socket.emit('username', username)
-            setUsername('')
+            // setUsername('')
             logged.current = true
         }
     }
@@ -187,40 +187,55 @@ function App() {
         <div className="App">
             <h1>Chat Socket.io</h1>
             <p>Users online: {users.length || 0}</p>
+            <p>{username || '---'}</p>
             <p>{myId.current}</p>
             <button onClick={() => console.log(myId.current)}>ID</button>
             <button onClick={() => console.log(inboxes)}>inbox</button>
             <button onClick={() => console.log(chats)}>chats</button>
+            <br />
+            <button onClick={() => navigate('/')}>home</button>
+            <button onClick={() => navigate('/game')}>tictactoe</button>
 
-            <div>{
-                !logged.current
-                    ? <UsernameInput
-                        handleUsername={handleUsername}
-                        username={username}
-                        setUsername={setUsername} />
-                    : <div className='container'>
-                        <Contacts myId={myId.current}
-                            handleOpenInbox={handleOpenInbox} />
-                        <ChatContainer myId={myId.current}
-                            chatBody={chatBody}
-                            message={message}
-                            handleSend={handleSend}
-                            handleIsTyping={handleIsTyping}
-                            handleOpenInbox={handleOpenInbox}
-                            userTyping={userTyping} />
-                    </div>
-            }</div>
 
-            {(chats) &&
-                Object.entries(chats).map(([k, v]) => (
-                    v.open &&
-                    <DMChat key={k + myId.current}
-                        user={{ id: k, name: v.name }}
-                        socket={socket}
-                        handleSendPrivate={handleSendPrivate}
-                    />
-                ))
-            }
+
+            <Routes>
+                <Route path="/" element={
+                    <div>{
+                        <>
+                            {!logged.current
+                                ? <UsernameInput
+                                    handleUsername={handleUsername}
+                                    username={username}
+                                    setUsername={setUsername} />
+                                : <div className='container'>
+                                    <Contacts myId={myId.current}
+                                        handleOpenInbox={handleOpenInbox} />
+                                    <ChatContainer myId={myId.current}
+                                        chatBody={chatBody}
+                                        message={message}
+                                        handleSend={handleSend}
+                                        handleIsTyping={handleIsTyping}
+                                        handleOpenInbox={handleOpenInbox}
+                                        userTyping={userTyping} />
+                                </div>}
+
+                            {(chats) &&
+                                Object.entries(chats).map(([k, v]) => (
+                                    v.open &&
+                                    <DMChat key={k + myId.current}
+                                        user={{ id: k, name: v.name }}
+                                        socket={socket}
+                                        handleSendPrivate={handleSendPrivate}
+                                    />
+                                ))
+                            }
+                        </>
+                    }</div>
+                } ></Route>
+                <Route path='/game' element={<TicTacToe socket={socket} />}></Route>
+            </Routes>
+
+
         </div>
     )
 }

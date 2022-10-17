@@ -4,3 +4,7 @@
     flex-direction: column;
     border: 1px solid orange;
 }
+
+.contacts-container b {
+    cursor: pointer;
+}

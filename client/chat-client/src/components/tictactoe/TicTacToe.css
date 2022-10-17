@@ -1,0 +1,21 @@
+.board>div {
+    /* display: grid;
+    grid-template-rows: 10rem 10rem 10rem;
+    grid-template-columns: 10rem 10rem 10rem; */
+    display: flex;
+
+}
+
+.tile {
+    height: 10rem;
+    width: 10rem;
+    border: 1px solid black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.tile:hover {
+    background-color: #303030;
+}
