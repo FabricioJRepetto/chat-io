@@ -19,6 +19,7 @@ function App() {
     const [username, setUsername] = useState('')
     const [userTyping, setUserTyping] = useState(false)
     const [message, setMessage] = useState('')
+    const [roomIdInput, setRoomIdInput] = useState('')
     const [chatBody, setChatBody] = useState([{
         message: 'Welcome to the chat!',
         from: 'system'
@@ -168,6 +169,7 @@ function App() {
         socket.on('DMisTyping', (data) => handleDMTyping(data))
         socket.on('DMStopTyping', (data) => handleDMTyping(data))
         socket.on('privateMessage', (d) => handleNewInbox(d))
+        socket.on('room', (d) => console.log(d))
 
         return () => {
             socket.off('connectionsUpdate')
@@ -178,35 +180,55 @@ function App() {
             socket.off('privateMessage')
             socket.off('DMisTyping')
             socket.off('DMStopTyping')
+            socket.off('room')
         }
         // dependencias deben estar vacías según documentación de socket.io
         // eslint-disable-next-line
     }, [])
 
+    const newTTTRoom = () => {
+        let roomid = Date.now().toString()
+        navigate(`/game/${roomid}`)
+    }
+
+    const joinRoom = () => {
+        if (roomIdInput.length === 13) {
+            navigate(`/game/${roomIdInput}`)
+        } else {
+            alert('Invalid ID')
+        }
+    }
+
     return (
         <div className="App">
             <h1>Chat Socket.io</h1>
-            <p>Users online: {users.length || 0}</p>
             <p>{username || '---'}</p>
-            <p>{myId.current}</p>
             <button onClick={() => console.log(myId.current)}>ID</button>
             <button onClick={() => console.log(inboxes)}>inbox</button>
             <button onClick={() => console.log(chats)}>chats</button>
             <br />
             <button onClick={() => navigate('/')}>home</button>
-            <button onClick={() => navigate('/game')}>tictactoe</button>
-
-
+            <button onClick={() => navigate('/game/test')}>tictactoe</button>
+            <br />
+            <button onClick={newTTTRoom}>Create New Room</button>
+            <button onClick={joinRoom}>Join Room</button>
+            <input type="text"
+                placeholder='Room ID'
+                value={roomIdInput}
+                onChange={(e) => setRoomIdInput(e.target.value)} />
 
             <Routes>
                 <Route path="/" element={
                     <div>{
                         <>
                             {!logged.current
-                                ? <UsernameInput
-                                    handleUsername={handleUsername}
-                                    username={username}
-                                    setUsername={setUsername} />
+                                ? <>
+                                    <p>Users online: {users.length || 0}</p>
+                                    <UsernameInput
+                                        handleUsername={handleUsername}
+                                        username={username}
+                                        setUsername={setUsername} />
+                                </>
                                 : <div className='container'>
                                     <Contacts myId={myId.current}
                                         handleOpenInbox={handleOpenInbox} />
@@ -232,7 +254,7 @@ function App() {
                         </>
                     }</div>
                 } ></Route>
-                <Route path='/game' element={<TicTacToe socket={socket} />}></Route>
+                <Route path='/game/:id' element={<TicTacToe socket={socket} myId={myId.current} />}></Route>
             </Routes>
 
 

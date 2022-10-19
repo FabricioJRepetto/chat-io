@@ -27,7 +27,8 @@ const app = express(),
 
 let usersOnline = [],
     lastTyping = 0,
-    typing = false
+    typing = false,
+    rooms = {}
 
 app.use(cors())
 app.use(morgan('dev'))
@@ -112,6 +113,65 @@ io.on('connection', (socket) => {
             }
         }, 2000);
     }
+
+    //? TaTeTi
+    socket.on('TTTRoom', (room) => {
+        if (!socket.rooms.has(room)) {
+            socket.join(room)
+
+            if (rooms[room]) {
+                if (rooms[room].usersList.length < 2) {
+                    rooms[room].usersList.push({
+                        name: socket.username,
+                        id: socket.id,
+                        role: 'player'
+                    })
+                    rooms[room].score[socket.id] = 0
+                    console.log(`Player ${socket.username} connected to room ${room}`);
+                } else {
+                    rooms[room].usersList.push({
+                        name: socket.username,
+                        id: socket.id,
+                        role: 'spectator'
+                    })
+                    console.log(`Spectator ${socket.username || 'X'} connected to room ${room}`);
+                }
+                socket.emit('roomUpdate', rooms[room])
+            } else {
+                rooms[room] = {
+                    board: {
+                        row0: ['', '', ''],
+                        row1: ['', '', ''],
+                        row2: ['', '', '']
+                    },
+                    usersList: [
+                        {
+                            name: socket.username,
+                            id: socket.id,
+                            role: 'owner'
+                        }
+                    ],
+                    rounds: 0,
+                    score: {
+                        [socket.id]: 0
+                    }
+                }
+                console.log(`Owner ${socket.username} connected to room ${room}`);
+            }
+
+            io.to(room).emit('roomUsersUpdate', { users: rooms[room].usersList, message: `${socket.username} has joined the room` });
+        } else {
+            console.log('User already conencted to this room');
+        }
+    })
+    socket.on('movement', (m) => {
+        socket.emit('movement', m)
+        //: enviar movimiento al otro jugador o a toda la sala (mejor opción)
+    })
+    socket.on('winner', (id) => {
+        socket.emit('winner', id)
+        //: enviar movimiento al otro jugador o a toda la sala (mejor opción)
+    })
 
     //? DISCONNECT
     socket.on('disconnect', () => {
