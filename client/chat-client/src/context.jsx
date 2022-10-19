@@ -13,6 +13,15 @@ function contextReducer(state, action) {
         case 'chatUpdate': {
             return { ...state, chats: action.payload }
         }
+        case 'setUsername': {
+            return { ...state, username: action.payload }
+        }
+        case 'setId': {
+            return { ...state, myId: action.payload }
+        }
+        case 'setLogged': {
+            return { ...state, logged: action.payload }
+        }
         default: {
             throw new Error(`Unhandled action type: ${action.type}`)
         }
@@ -20,7 +29,7 @@ function contextReducer(state, action) {
 }
 
 function ContextProvider({ children }) {
-    const [state, dispatch] = useReducer(contextReducer, { users: [], inboxes: new Map(), chats: {} })
+    const [state, dispatch] = useReducer(contextReducer, { users: [], inboxes: new Map(), chats: {}, username: '', myId: '', logged: false })
     const value = { state, dispatch }
 
     return <ContextContext.Provider value={value}>{children}</ContextContext.Provider>

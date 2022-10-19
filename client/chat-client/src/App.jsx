@@ -14,61 +14,27 @@ import './App.css'
 const socket = io(BACK_URL)
 
 function App() {
-    const logged = useRef(false)
-    const myId = useRef(false)
-    const [username, setUsername] = useState('')
-    const [userTyping, setUserTyping] = useState(false)
-    const [message, setMessage] = useState('')
     const [roomIdInput, setRoomIdInput] = useState('')
-    const [chatBody, setChatBody] = useState([{
-        message: 'Welcome to the chat!',
-        from: 'system'
-    }])
     const navigate = useNavigate()
-    const { dispatch, state: { users, inboxes, chats } } = useCon()
-
-    // importante utilizar una cb para setear los mensajes
-    //? https://stackoverflow.com/questions/70671831/react-socket-io-not-displaying-latest-message-passed-down-as-prop
-    const handleNewMessage = (m) => {
-        if (logged.current) {
-            setChatBody(prev => [...prev, m])
+    const { dispatch,
+        state: {
+            users,
+            inboxes,
+            chats,
+            username,
+            logged
         }
-    }
+    } = useCon()
+    const myId = useRef(null)
 
     const handleNewConnection = (c) => {
-        myId.current = c.id
         dispatch({ type: 'usersUpdate', payload: c.usersOnline })
+        dispatch({ type: 'setId', payload: c.id })
+        myId.current = c.id
     }
 
     const handleConnectionsUpdate = (u) => {
         dispatch({ type: 'usersUpdate', payload: u.usersOnline })
-    }
-
-    const handleSend = (e) => {
-        e.preventDefault()
-        if (message.length) {
-            socket.emit('newMessage', message)
-            socket.emit('isNotTyping')
-            setMessage('')
-        }
-    }
-
-    const handleUsername = (e) => {
-        e.preventDefault()
-        if (username && username.length < 15) {
-            socket.emit('username', username)
-            // setUsername('')
-            logged.current = true
-        }
-    }
-
-    const handleUserTyping = (u) => {
-        setUserTyping(u || false)
-    }
-
-    const handleIsTyping = (e) => {
-        setMessage(e.target.value)
-        socket.emit('isTyping')
     }
 
     const handleSendPrivate = (data) => {
@@ -92,7 +58,7 @@ function App() {
                 typing: false,
                 unseen: false
             }
-            console.log(newDmChat);
+
             dispatch({ type: 'chatUpdate', payload: newDmChat })
         } catch (err) {
             console.log(err);
@@ -106,6 +72,7 @@ function App() {
         try {
             // si el destinatario soy yo, abro el chat
             // y agrego el chat al context
+            console.log(myId.current);
             if (m.to.id === myId.current) {
                 let newDmChat = chats
                 if (chats[m.from.id]) {
@@ -163,9 +130,6 @@ function App() {
     useEffect(() => {
         socket.on('newConnection', (c) => handleNewConnection(c))
         socket.on('connectionsUpdate', (u) => handleConnectionsUpdate(u))
-        socket.on('newMessage', (m) => handleNewMessage(m, logged))
-        socket.on('userTyping', (u) => handleUserTyping(u))
-        socket.on('userStopTyping', () => setUserTyping(false))
         socket.on('DMisTyping', (data) => handleDMTyping(data))
         socket.on('DMStopTyping', (data) => handleDMTyping(data))
         socket.on('privateMessage', (d) => handleNewInbox(d))
@@ -174,9 +138,6 @@ function App() {
         return () => {
             socket.off('connectionsUpdate')
             socket.off('newConnection')
-            socket.off('newMessage')
-            socket.off('userTyping')
-            socket.off('userStopTyping')
             socket.off('privateMessage')
             socket.off('DMisTyping')
             socket.off('DMStopTyping')
@@ -221,24 +182,15 @@ function App() {
                 <Route path="/" element={
                     <div>{
                         <>
-                            {!logged.current
+                            {!logged
                                 ? <>
                                     <p>Users online: {users.length || 0}</p>
-                                    <UsernameInput
-                                        handleUsername={handleUsername}
-                                        username={username}
-                                        setUsername={setUsername} />
+                                    <UsernameInput socket={socket} />
                                 </>
                                 : <div className='container'>
-                                    <Contacts myId={myId.current}
+                                    <Contacts handleOpenInbox={handleOpenInbox} />
+                                    <ChatContainer socket={socket}
                                         handleOpenInbox={handleOpenInbox} />
-                                    <ChatContainer myId={myId.current}
-                                        chatBody={chatBody}
-                                        message={message}
-                                        handleSend={handleSend}
-                                        handleIsTyping={handleIsTyping}
-                                        handleOpenInbox={handleOpenInbox}
-                                        userTyping={userTyping} />
                                 </div>}
 
                             {(chats) &&
@@ -254,7 +206,7 @@ function App() {
                         </>
                     }</div>
                 } ></Route>
-                <Route path='/game/:id' element={<TicTacToe socket={socket} myId={myId.current} />}></Route>
+                <Route path='/game/:id' element={<TicTacToe socket={socket} />}></Route>
             </Routes>
 
 

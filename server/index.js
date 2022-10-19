@@ -140,9 +140,9 @@ io.on('connection', (socket) => {
             } else {
                 rooms[room] = {
                     board: {
-                        row0: ['', '', ''],
-                        row1: ['', '', ''],
-                        row2: ['', '', '']
+                        row0: [null, null, null],
+                        row1: [null, null, null],
+                        row2: [null, null, null]
                     },
                     usersList: [
                         {
@@ -165,12 +165,23 @@ io.on('connection', (socket) => {
         }
     })
     socket.on('movement', (m) => {
-        socket.emit('movement', m)
-        //: enviar movimiento al otro jugador o a toda la sala (mejor opción)
+        console.log('movement: ', m);
+        io.to(m.room).emit('movement', m)
+        //: actualizar tablero local
     })
-    socket.on('winner', (id) => {
-        socket.emit('winner', id)
-        //: enviar movimiento al otro jugador o a toda la sala (mejor opción)
+    socket.on('roundEnd', ({ m, room, type }) => {
+        rooms[room].rounds += 1
+        rooms[room].board = {
+            row0: [null, null, null],
+            row1: [null, null, null],
+            row2: [null, null, null]
+        }
+        type === 'winner' && (rooms[room].score[socket.id] += 1)
+
+        io.to(room).emit('movement', m)
+    })
+    socket.on('start', (room) => {
+        io.to(room).emit('start')
     })
 
     //? DISCONNECT

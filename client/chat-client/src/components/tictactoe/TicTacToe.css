@@ -1,3 +1,8 @@
+.playing {
+    display: flex;
+    flex-direction: column;
+}
+
 .board>div {
     /* display: grid;
     grid-template-rows: 10rem 10rem 10rem;
@@ -18,5 +23,10 @@
 }
 
 .tile:hover {
-    background-color: #303030;
+    background-color: #303030 !important;
+}
+
+.game-container {
+    display: flex;
+
 }

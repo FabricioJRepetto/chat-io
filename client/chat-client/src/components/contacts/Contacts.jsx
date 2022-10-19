@@ -3,8 +3,8 @@ import { useCon } from '../../context'
 
 import './Contacts.css'
 
-const Contacts = ({ myId, handleOpenInbox }) => {
-    const { state: { users } } = useCon()
+const Contacts = ({ handleOpenInbox }) => {
+    const { state: { users, myId } } = useCon()
     const [usersOnline, setUsersOnline] = useState(false)
 
     useEffect(() => {
