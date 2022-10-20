@@ -116,53 +116,54 @@ io.on('connection', (socket) => {
 
     //? TaTeTi
     socket.on('TTTRoom', (room) => {
-        if (!socket.rooms.has(room)) {
-            socket.join(room)
+        if (socket.rooms.has(room)) return console.log('User already conencted to this room')
 
-            if (rooms[room]) {
-                if (rooms[room].usersList.length < 2) {
-                    rooms[room].usersList.push({
-                        name: socket.username,
-                        id: socket.id,
-                        role: 'player'
-                    })
-                    rooms[room].score[socket.id] = 0
-                    console.log(`Player ${socket.username} connected to room ${room}`);
-                } else {
-                    rooms[room].usersList.push({
-                        name: socket.username,
-                        id: socket.id,
-                        role: 'spectator'
-                    })
-                    console.log(`Spectator ${socket.username || 'X'} connected to room ${room}`);
-                }
-                socket.emit('roomUpdate', rooms[room])
+        socket.join(room)
+        console.log(`${socket.username} joined room ${room}`);
+
+        if (rooms[room]) {
+            if (rooms[room].usersList.length < 2) {
+                rooms[room].usersList.push({
+                    name: socket.username,
+                    id: socket.id,
+                    role: 'player'
+                })
+                rooms[room].score[socket.id] = 0
+                console.log(`Player ${socket.username} connected to room ${room}`);
             } else {
-                rooms[room] = {
-                    board: {
-                        row0: [null, null, null],
-                        row1: [null, null, null],
-                        row2: [null, null, null]
-                    },
-                    usersList: [
-                        {
-                            name: socket.username,
-                            id: socket.id,
-                            role: 'owner'
-                        }
-                    ],
-                    rounds: 0,
-                    score: {
-                        [socket.id]: 0
-                    }
-                }
-                console.log(`Owner ${socket.username} connected to room ${room}`);
+                rooms[room].usersList.push({
+                    name: socket.username,
+                    id: socket.id,
+                    role: 'spectator'
+                })
+                console.log(`Spectator ${socket.username || 'X'} connected to room ${room}`);
             }
-
-            io.to(room).emit('roomUsersUpdate', { users: rooms[room].usersList, message: `${socket.username} has joined the room` });
+            socket.emit('roomUpdate', rooms[room])
         } else {
-            console.log('User already conencted to this room');
+            rooms[room] = {
+                board: {
+                    row0: [null, null, null],
+                    row1: [null, null, null],
+                    row2: [null, null, null]
+                },
+                usersList: [
+                    {
+                        name: socket.username,
+                        id: socket.id,
+                        role: 'owner'
+                    }
+                ],
+                winCondition: 0,
+                rounds: 0,
+                score: {
+                    [socket.id]: 0
+                },
+                continue: []
+            }
+            console.log(`Owner ${socket.username} connected to room ${room}`);
         }
+
+        io.to(room).emit('roomUsersUpdate', { users: rooms[room].usersList, message: `${socket.username} has joined the room` });
     })
     socket.on('movement', (m) => {
         console.log('movement: ', m);
@@ -178,11 +179,38 @@ io.on('connection', (socket) => {
         }
         type === 'winner' && (rooms[room].score[socket.id] += 1)
 
-        io.to(room).emit('movement', m)
+        if (rooms[room].score[socket.id] === rooms[room].winCondition) {
+            //: final winner
+            io.to(room).emit('movement', { ...m, final: true })
+        } else {
+            io.to(room).emit('movement', m)
+        }
     })
-    socket.on('start', (room) => {
+    socket.on('start', ({ room, winCon }) => {
+        //: config
+        rooms[room].winCondition = winCon
         io.to(room).emit('start')
     })
+    socket.on('playerReady', ({ room, id }) => {
+        if (!rooms[room].continue.includes(id)) rooms[room].continue.push(id)
+
+        if (rooms[room].continue.length > 1) {
+            io.to(room).emit('continue', {
+                rounds: rooms[room].rounds,
+                score: rooms[room].score
+            })
+            rooms[room].continue = []
+        }
+    })
+    socket.on('leaveRoom', (room) => {
+        console.log(rooms);
+
+        // let aux = aux.filter(u => u.id !== socket.id)
+        // rooms[room].usersList = aux
+        // socket.leave(room)
+        // io.to(room).emit('roomUsersUpdate', { message: `${socket.username} left the room`, users: aux })
+    })
+
 
     //? DISCONNECT
     socket.on('disconnect', () => {

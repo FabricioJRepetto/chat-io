@@ -1,21 +1,25 @@
 import React, { useState, useRef } from 'react'
 import { useEffect } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useCon } from '../../context'
 import './TicTacToe.css'
 
 const TicTacToe = ({ socket }) => {
     const { state: { myId, username } } = useCon()
     const { id: roomid } = useParams()
+    const navigate = useNavigate()
     const [users, setUsers] = useState([])
-    const [playing, setPlaying] = useState(false)
-    const [score, setScore] = useState({})
-    const [rounds, setRounds] = useState(0)
-    const [turn, setTurn] = useState(1)
-    const [sign, setSign] = useState('O')
-    // const currentTurn = useRef(null)
-    const [currentTurn, setCurrentTurn] = useState(false)
     const otherPlayer = useRef(false)
+    const [sign, setSign] = useState('O')
+    const [winCon, setWinCon] = useState(3)
+
+    const [playing, setPlaying] = useState(false)
+    const [waiting, setWaiting] = useState(false)
+    const [turn, setTurn] = useState(1)
+    const [currentTurn, setCurrentTurn] = useState(false)
+
+    const [rounds, setRounds] = useState(0)
+    const [score, setScore] = useState({})
 
     //? TABLERO
     const [row0, setRow0] = useState([null, null, null])
@@ -86,36 +90,51 @@ const TicTacToe = ({ socket }) => {
                 break;
         }
 
-        console.log(turn);
+        // console.log(`%c ${username} (you) moves: R: ${r} - C: ${c} `, 'background-color: #bbff7b; color: #000000; font-weight: bold;');
 
         if (turn === 9) {
             //: emit draw y actualizar data de la partida
-            socket.emit('roundEnd', { id: myId, room: roomid, type: 'draw', m: { r, c, final: `DRAW` } })
-            //: abrir modal de DRAW
-            alert('DRAW!!')
-            //: al cerrarlo, resetear todo
-            resetBoard()
+            socket.emit('roundEnd', { room: roomid, type: 'draw', m: { r, c, id: myId, roundEnd: `DRAW` } })
             return
 
         } else if (turn >= 3) {
             let win = checkTicTacToe()
             if (win) {
-                socket.emit('roundEnd', { id: myId, room: roomid, type: 'winner', m: { r, c, final: `YOU LOSE...` } })
-                setTimeout(() => {
-                    alert(`YOU WIN!`)
-                    //: al cerrar el modal, resetear
-                    resetBoard()
-                }, 1000);
-            } else return socket.emit('movement', { r, c, id: myId, room: roomid })
+                //: desactivar el click del usuario
+                //: esperar la otro usuario para contunuar la partida
+                setWaiting(true)
+                socket.emit('roundEnd', { room: roomid, type: 'winner', m: { r, c, id: myId, roundEnd: `YOU LOSE THIS ROUND...` } })
+            } else socket.emit('movement', { r, c, id: myId, room: roomid })
 
         } else socket.emit('movement', { r, c, id: myId, room: roomid })
 
-        setCurrentTurn(() => otherPlayer.current)
+        setCurrentTurn(() => otherPlayer.current.id)
     }
 
     //? MOVIMIENTO DEL OTRO JUGADOR
-    const movementSync = ({ r, c, id, final = false }) => {
-        if (id === myId) return
+    const movementSync = ({ r, c, id, roundEnd = false, final = false }) => {
+        if (id === myId) {
+            //: notifica si gana el originador del movimiento
+            if (final) {
+                setTimeout(() => {
+                    alert('GANASTE PAJERO!')
+                    setPlaying(false)
+                    resetBoard()
+                }, 1000);
+            } else if (roundEnd) {
+                setTimeout(() => {
+                    alert('YOU WIN THIS ROUND!')
+                    resetBoard()
+                }, 1000);
+            }
+            return
+        }
+
+        // console.log(`%c Player 2 moves: R: ${r} - C: ${c} `, 'background-color: #ffbd7b; color: #000000; font-weight: bold;');
+
+        //: desactivar el click del usuario
+        //: esperar la otro usuario para contunuar la partida
+        if (roundEnd) setWaiting(true)
 
         setTurn(current => {
             let aux = current
@@ -126,6 +145,7 @@ const TicTacToe = ({ socket }) => {
 
         switch (r) {
             case 0:
+                console.log(!row0[c]);
                 if (!row0[c]) {
                     setRow0((current) => {
                         let aux = current
@@ -136,6 +156,7 @@ const TicTacToe = ({ socket }) => {
                 break;
 
             case 1:
+                console.log(!row1[c]);
                 if (!row1[c]) {
                     setRow1((current) => {
                         let aux = current
@@ -146,6 +167,7 @@ const TicTacToe = ({ socket }) => {
                 break;
 
             default:
+                console.log(!row2[c]);
                 if (!row2[c]) {
                     setRow2((current) => {
                         let aux = current
@@ -157,10 +179,20 @@ const TicTacToe = ({ socket }) => {
         }
 
         if (final) {
+            //: modal final del juego
+            setTimeout(() => {
+                alert(`THE WINNER IS ${otherPlayer.current.name}`)
+                setPlaying(false)
+                resetBoard()
+            }, 1000);
+            return
+        }
+
+        if (roundEnd) {
             // if es un player
             setTimeout(() => {
-                //: modal final
-                alert(final)
+                //: modal final de round
+                alert(roundEnd)
                 //: reset
                 resetBoard()
             }, 1000);
@@ -171,6 +203,8 @@ const TicTacToe = ({ socket }) => {
     }
 
     const resetBoard = () => {
+        //: avisar al back que estoy listo
+        socket.emit('playerReady', { room: roomid, id: myId })
         setTurn(1)
         setRow0([null, null, null])
         setRow1([null, null, null])
@@ -188,42 +222,62 @@ const TicTacToe = ({ socket }) => {
 
     const userListUpdater = ({ users, message }) => {
         console.log(message)
+        console.log('USUARIOS', users);
         setUsers(users)
         if (users.length === 2) otherPlayer.current = users.find(e => e.id !== myId)
     }
 
     const startMatch = () => {
-        socket.emit('start', roomid)
+        //: setear win condition, mejor de 3 || 5, no joda        
+        socket.emit('start', { room: roomid, winCon: Math.ceil(winCon / 2) })
     }
     const startHandler = () => {
         setPlaying(true)
         alert('Game starts!')
 
         setUsers(current => {
-            console.log(current[0].id);
             setCurrentTurn(() => current[0].id)
             return current
         })
     }
 
+    const continueMatch = ({ rounds, score }) => {
+        setRounds(rounds)
+        setScore(score)
+        setWaiting(false)
+    }
+
+    const leave = () => {
+        console.log(roomid);
+        //: se desconecta de la sala
+        socket.emit('leaveRoom', roomid)
+        navigate('/')
+    }
+
     useEffect(() => {
         //? se conecta a la sala
         socket.emit('TTTRoom', roomid)
+
+        return () => {
+            //: se desconecta de la sala
+            socket.emit('leaveRoom', roomid)
+        }
         // eslint-disable-next-line
     }, [])
-
 
     useEffect(() => {
         socket.on('roomUpdate', (data) => roomUpdater(data))
         socket.on('roomUsersUpdate', (data) => userListUpdater(data))
         socket.on('movement', (m) => movementSync(m))
-        socket.on('start', () => startHandler())
+        socket.on('start', startHandler)
+        socket.on('continue', (data) => continueMatch(data))
 
         return () => {
             socket.off('roomUpdate')
             socket.off('roomUsersUpdate')
             socket.off('movement')
             socket.off('start')
+            socket.off('continue')
         }
         // eslint-disable-next-line
     }, [])
@@ -233,33 +287,32 @@ const TicTacToe = ({ socket }) => {
         <div>
             <h1>TicTacToe</h1>
             <h3>Room ID: {roomid}</h3>
+            <button onClick={leave}>Leave room</button>
             <button onClick={() => {
                 console.log(row0)
                 console.log(row1)
                 console.log(row2)
-            }
-            }>Board</button>
-            <br />
-            <button onClick={resetBoard}>reset</button>
+            }}>Board</button>
+            <button onClick={() => console.log(otherPlayer.current)}>Player 2</button>
 
             <div className='game-container'>
                 {playing
                     ? <div className='playing'>
                         <>
                             <h2>{currentTurn === myId ? 'Your turn!' : 'Waiting for your oponents movement'}</h2>
-                            <div>player #1: {score[users[0].id] || 0}</div>
-                            <div>player #2: {score[users[1].id] || 0}</div>
+                            <div>{users[0].name}: {score[users[0].id] || 0}</div>
+                            <div>{users[1].name}: {score[users[1].id] || 0}</div>
                             <div>Round: {rounds}</div>
                             <div>Turn: {turn}</div>
                         </>
 
-                        <div className='board' style={{ pointerEvents: currentTurn === myId ? 'all' : 'none' }}>
+                        <div className='board'>
                             <div>{
                                 row0.map((tile, i) => (
                                     <div key={'r0' + i}
                                         className="tile"
                                         onClick={() => tilePicker({ r: 0, c: i, id: myId })}
-                                        style={{ backgroundColor: tile === sign ? '#3c5040' : 'transparent', pointerEvents: currentTurn === myId && !tile ? 'all' : 'none' }}>{tile}</div>
+                                        style={{ backgroundColor: tile === sign ? '#3c5040' : 'transparent', pointerEvents: (currentTurn === myId && !tile && !waiting) ? 'all' : 'none' }}>{tile}</div>
                                 ))
                             }</div>
                             <div>{
@@ -267,7 +320,7 @@ const TicTacToe = ({ socket }) => {
                                     <div key={'r1' + i}
                                         className="tile"
                                         onClick={() => tilePicker({ r: 1, c: i, id: myId })}
-                                        style={{ backgroundColor: tile === sign ? '#3c5040' : 'transparent', pointerEvents: currentTurn === myId && !tile ? 'all' : 'none' }}>{tile}</div>
+                                        style={{ backgroundColor: tile === sign ? '#3c5040' : 'transparent', pointerEvents: (currentTurn === myId && !tile && !waiting) ? 'all' : 'none' }}>{tile}</div>
                                 ))
                             }</div>
                             <div>{
@@ -275,7 +328,7 @@ const TicTacToe = ({ socket }) => {
                                     <div key={'r2' + i}
                                         className="tile"
                                         onClick={() => tilePicker({ r: 2, c: i, id: myId })}
-                                        style={{ backgroundColor: tile === sign ? '#3c5040' : 'transparent', pointerEvents: currentTurn === myId && !tile ? 'all' : 'none' }}>{tile}</div>
+                                        style={{ backgroundColor: tile === sign ? '#3c5040' : 'transparent', pointerEvents: (currentTurn === myId && !tile && !waiting) ? 'all' : 'none' }}>{tile}</div>
                                 ))
                             }</div>
                         </div>
@@ -285,8 +338,14 @@ const TicTacToe = ({ socket }) => {
                             ? <h2>Waiting for a challenger...</h2>
                             : <h2>{users[1].name} has join!</h2>}
                         {users.find(u => u.id === myId && u.role === 'owner') &&
-                            <button onClick={startMatch}
-                                disabled={users.length < 2}>START</button>}
+                            <>
+                                <select name="betterOf" id="betterOfInput" onChange={(e) => setWinCon(e.target.value)}>
+                                    <option value="3" defaultChecked>3</option>
+                                    <option value="5">5</option>
+                                </select>
+                                <button onClick={startMatch}
+                                    disabled={users.length < 2}>START</button>
+                            </>}
                     </>}
                 <div className='room-user-list'>Usuarios: {
                     users.length &&
