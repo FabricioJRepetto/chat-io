@@ -1,3 +1,3 @@
-const BACK_URL = 'http://localhost:4000'
+const BACK_URL = 'https://tictactoeio.vercel.app'
 
 export { BACK_URL }
