@@ -240,4 +240,4 @@ server.listen(PORT, () => {
     console.log('Server listening on port ', PORT);
 })
 
-app.get('/', (req, res, next) => res.send('Chat server.'))
+app.get('/', (req, res, next) => res.send('Hello World.'))
