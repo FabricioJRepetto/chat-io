@@ -160,7 +160,7 @@ io.on('connection', (socket) => {
                 },
                 continue: []
             }
-            console.log(`Owner ${socket.username} connected to room ${room}`);
+            console.log(`${socket.username} created room ${room}`)
         }
 
         io.to(room).emit('roomUsersUpdate', { users: rooms[room].usersList, message: `${socket.username} has joined the room` });
@@ -203,12 +203,22 @@ io.on('connection', (socket) => {
         }
     })
     socket.on('leaveRoom', (room) => {
-        console.log(rooms);
+        try {
+            let aux = rooms[room].usersList
+            aux = aux.filter(u => u.id !== socket.id)
+            rooms[room].usersList = aux
+            socket.leave(room)
 
-        // let aux = aux.filter(u => u.id !== socket.id)
-        // rooms[room].usersList = aux
-        // socket.leave(room)
-        // io.to(room).emit('roomUsersUpdate', { message: `${socket.username} left the room`, users: aux })
+            if (rooms[room].usersList.length > 0) {
+                io.to(room).emit('disconnect', { message: `${socket.username} left the room`, users: aux })
+                // io.to(room).emit('roomUsersUpdate', { message: `${socket.username} left the room`, users: aux })
+            } else {
+                console.log(`Closing room ${room}`);
+                delete rooms[room]
+            }
+        } catch (error) {
+            console.log(error);
+        }
     })
 
 

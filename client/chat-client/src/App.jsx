@@ -2,9 +2,9 @@ import React, { useState, useEffect, useRef } from 'react'
 import { Routes, Route, useNavigate } from "react-router-dom";
 import io from 'socket.io-client'
 import { BACK_URL } from './constants'
-import ChatContainer from './components/ChatContainer'
 import UsernameInput from './components/UsernameInput'
 import Contacts from './components/contacts/Contacts'
+import ChatContainer from './components/ChatContainer'
 import DMChat from './components/dmChat/DMChat'
 import TicTacToe from './components/tictactoe/TicTacToe';
 import { useCon } from './context'
@@ -162,21 +162,7 @@ function App() {
 
     return (
         <div className="App">
-            <h1>Chat Socket.io</h1>
-            <p>{username || '---'}</p>
-            <button onClick={() => console.log(myId.current)}>ID</button>
-            <button onClick={() => console.log(inboxes)}>inbox</button>
-            <button onClick={() => console.log(chats)}>chats</button>
-            <br />
-            <button onClick={() => navigate('/')}>home</button>
-            <button onClick={() => navigate('/game/test')}>tictactoe</button>
-            <br />
-            <button onClick={newTTTRoom}>Create New Room</button>
-            <button onClick={joinRoom}>Join Room</button>
-            <input type="text"
-                placeholder='Room ID'
-                value={roomIdInput}
-                onChange={(e) => setRoomIdInput(e.target.value)} />
+            <h1>TicTacToe Beta v1</h1>
 
             <Routes>
                 <Route path="/" element={
@@ -188,9 +174,17 @@ function App() {
                                     <UsernameInput socket={socket} />
                                 </>
                                 : <div className='container'>
-                                    <Contacts handleOpenInbox={handleOpenInbox} />
-                                    <ChatContainer socket={socket}
-                                        handleOpenInbox={handleOpenInbox} />
+                                    {/* <Contacts handleOpenInbox={handleOpenInbox} />
+                                    <ChatContainer socket={socket} handleOpenInbox={handleOpenInbox} /> 
+                                    <button onClick={() => navigate('/')}>home</button>
+                                    */}
+                                    <br />
+                                    <button onClick={newTTTRoom}>Create New Room</button>
+                                    <button onClick={joinRoom}>Join Room</button>
+                                    <input type="text"
+                                        placeholder='Room ID'
+                                        value={roomIdInput}
+                                        onChange={(e) => setRoomIdInput(e.target.value)} />
                                 </div>}
 
                             {(chats) &&

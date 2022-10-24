@@ -117,13 +117,13 @@ const TicTacToe = ({ socket }) => {
             //: notifica si gana el originador del movimiento
             if (final) {
                 setTimeout(() => {
-                    alert('GANASTE PAJERO!')
+                    alert(`YOU'RE THE WINNER!`)
                     setPlaying(false)
                     resetBoard()
                 }, 1000);
             } else if (roundEnd) {
                 setTimeout(() => {
-                    alert('YOU WIN THIS ROUND!')
+                    roundEnd === 'DRAW' ? alert('DRAW') : alert('YOU WIN THIS ROUND!')
                     resetBoard()
                 }, 1000);
             }
@@ -220,9 +220,8 @@ const TicTacToe = ({ socket }) => {
         setScore(score)
     }
 
-    const userListUpdater = ({ users, message }) => {
+    const userListUpdater = ({ users, message, reset = false }) => {
         console.log(message)
-        console.log('USUARIOS', users);
         setUsers(users)
         if (users.length === 2) otherPlayer.current = users.find(e => e.id !== myId)
     }
@@ -248,8 +247,14 @@ const TicTacToe = ({ socket }) => {
     }
 
     const leave = () => {
-        console.log(roomid);
         //: se desconecta de la sala
+        socket.emit('leaveRoom', roomid)
+        navigate('/')
+    }
+
+    const disconnect = ({ message }) => {
+        //: se desconecta de la sala
+        alert(message)
         socket.emit('leaveRoom', roomid)
         navigate('/')
     }
@@ -271,6 +276,7 @@ const TicTacToe = ({ socket }) => {
         socket.on('movement', (m) => movementSync(m))
         socket.on('start', startHandler)
         socket.on('continue', (data) => continueMatch(data))
+        socket.on('disconnect', (data) => disconnect(data))
 
         return () => {
             socket.off('roomUpdate')
@@ -278,6 +284,7 @@ const TicTacToe = ({ socket }) => {
             socket.off('movement')
             socket.off('start')
             socket.off('continue')
+            socket.off('leave')
         }
         // eslint-disable-next-line
     }, [])
