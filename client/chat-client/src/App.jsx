@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Routes, Route, useNavigate } from "react-router-dom";
 import io from 'socket.io-client'
 import { BACK_URL } from './constants'
@@ -44,26 +44,26 @@ function App() {
         })
     }
 
-    const handleOpenInbox = ({ id, name }) => {
-        try {
-            let aux = inboxes
-            if (!aux.has(id)) aux.set(id, { name, messages: [] })
-            dispatch({ type: 'newInbox', payload: aux })
+    // const handleOpenInbox = ({ id, name }) => {
+    //     try {
+    //         let aux = inboxes
+    //         if (!aux.has(id)) aux.set(id, { name, messages: [] })
+    //         dispatch({ type: 'newInbox', payload: aux })
 
-            let newDmChat = chats || {}
-            newDmChat[id] = {
-                name,
-                open: true,
-                expanded: true,
-                typing: false,
-                unseen: false
-            }
+    //         let newDmChat = chats || {}
+    //         newDmChat[id] = {
+    //             name,
+    //             open: true,
+    //             expanded: true,
+    //             typing: false,
+    //             unseen: false
+    //         }
 
-            dispatch({ type: 'chatUpdate', payload: newDmChat })
-        } catch (err) {
-            console.log(err);
-        }
-    }
+    //         dispatch({ type: 'chatUpdate', payload: newDmChat })
+    //     } catch (err) {
+    //         console.log(err);
+    //     }
+    // }
 
     // Al ser una callback e intentar acceder al estado mediante el hook useState
     // obtengo el valor por defecto (sin importar que se haya actualizado antes)
