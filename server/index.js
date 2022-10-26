@@ -204,17 +204,18 @@ io.on('connection', (socket) => {
     })
     socket.on('leaveRoom', (room) => {
         try {
-            let aux = rooms[room].usersList
+            let aux = [...rooms[room].usersList]
             aux = aux.filter(u => u.id !== socket.id)
-            rooms[room].usersList = aux
+            rooms[room].usersList = [...aux]
+
             socket.leave(room)
 
             if (rooms[room].usersList.length > 0) {
-                io.to(room).emit('disconnect', { message: `${socket.username} left the room`, users: aux })
+                io.to(room).emit('leaveRoom', { message: `${socket.username} left the room`, users: aux })
                 // io.to(room).emit('roomUsersUpdate', { message: `${socket.username} left the room`, users: aux })
             } else {
                 console.log(`Closing room ${room}`);
-                delete rooms[room]
+                // delete rooms[room]
             }
         } catch (error) {
             console.log(error);

@@ -1,5 +1,5 @@
-const BACK_URL = 'https://websocket-project-server.glitch.me'
+const BACK_URL = 'http://localhost:4000'
 // https://websocket-project-server.glitch.me
-// http://localhost:3000
+// http://localhost:4000
 
 export { BACK_URL }

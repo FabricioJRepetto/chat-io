@@ -276,7 +276,7 @@ const TicTacToe = ({ socket }) => {
         socket.on('movement', (m) => movementSync(m))
         socket.on('start', startHandler)
         socket.on('continue', (data) => continueMatch(data))
-        socket.on('disconnect', (data) => disconnect(data))
+        socket.on('leaveRoom', (data) => disconnect(data))
 
         return () => {
             socket.off('roomUpdate')
@@ -284,7 +284,7 @@ const TicTacToe = ({ socket }) => {
             socket.off('movement')
             socket.off('start')
             socket.off('continue')
-            socket.off('leave')
+            socket.off('leaveRoom')
         }
         // eslint-disable-next-line
     }, [])
