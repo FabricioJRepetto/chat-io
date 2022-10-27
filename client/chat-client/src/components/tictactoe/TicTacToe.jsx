@@ -70,20 +70,18 @@ const TicTacToe = ({ socket }) => {
                 break;
         }
 
-        // console.log(`%c ${username} (you) moves: R: ${r} - C: ${c} `, 'background-color: #bbff7b; color: #000000; font-weight: bold;');
-
-        if (turn === 9) {
-            //: emit draw y actualizar data de la partida
-            socket.emit('roundEnd', { room: roomid, type: 'draw', m: { r, c, id: myId, roundEnd: `DRAW` } })
-            return
-
-        } else if (turn >= 3) {
+        if (turn >= 4) {
             let win = checkLine(MOVES.current)
             if (win) {
                 //: desactivar el click del usuario
                 //: esperar la otro usuario para contunuar la partida
                 setWaiting(true)
                 socket.emit('roundEnd', { room: roomid, type: 'winner', m: { r, c, id: myId, roundEnd: `YOU LOSE THIS ROUND...` } })
+            } else if (turn > 8) {
+                //: emit draw y actualizar data de la partida
+                socket.emit('roundEnd', { room: roomid, type: 'draw', m: { r, c, id: myId, roundEnd: `DRAW` } })
+                return
+
             } else socket.emit('movement', { r, c, id: myId, room: roomid })
 
         } else socket.emit('movement', { r, c, id: myId, room: roomid })
@@ -109,8 +107,6 @@ const TicTacToe = ({ socket }) => {
             }
             return
         }
-
-        // console.log(`%c Player 2 moves: R: ${r} - C: ${c} `, 'background-color: #ffbd7b; color: #000000; font-weight: bold;');
 
         //: desactivar el click del usuario
         //: esperar la otro usuario para contunuar la partida

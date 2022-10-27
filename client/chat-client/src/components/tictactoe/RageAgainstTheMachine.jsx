@@ -13,7 +13,7 @@ const RageAgainstTheMachine = () => {
     const [round, setRound] = useState(0)
     const [turn, setTurn] = useState(0)
     const [sign, setSign] = useState('X')
-    const [winCon, setWinCon] = useState(3)
+    const [winCon, setWinCon] = useState(2)
 
     //? TABLERO
     const [row0, setRow0] = useState([null, null, null])
@@ -30,97 +30,104 @@ const RageAgainstTheMachine = () => {
     const emptyTiles = useRef([{ r: 0, c: 0 }, { r: 0, c: 1 }, { r: 0, c: 2 }, { r: 1, c: 0 }, { r: 1, c: 1 }, { r: 1, c: 2 }, { r: 2, c: 0 }, { r: 2, c: 1 }, { r: 2, c: 2 }])
 
     const tilePicker = ({ r, c }, player = true) => {
-        setTurn(current => {
-            let aux = current
-            aux++
-            return aux
-        })
+        try {
+            setTurn(current => {
+                let aux = current
+                aux++
+                return aux
+            })
 
-        console.log(r, c);
+            player || console.log(r, c);
 
-        const { A, B, C } = player ? MOVES.current : BOTMOVES.current
-        let aux = [],
-            aux2 = [...emptyTiles.current],
-            auxSign = player
-                ? sign
-                : sign === 'X'
-                    ? 'O'
-                    : 'X'
+            const { A, B, C } = player ? MOVES.current : BOTMOVES.current
+            let aux = [],
+                aux2 = [...emptyTiles.current],
+                auxSign = player
+                    ? sign
+                    : sign === 'X'
+                        ? 'O'
+                        : 'X'
 
-        switch (r) {
-            case 0:
-                if (!row0[c]) {
-                    //? modifico tablero
-                    setRow0(curr => {
-                        aux = [...curr]
-                        aux.splice(c, 1, auxSign)
-                        return aux
-                    })
-                    //? agrego movimiento del player/bot
-                    A.push(c)
-                    //? quito movimiento de la lista de disponibles para el bot
-                    emptyTiles.current = aux2.filter(t => (t.r === 0 && t.c !== c) || (t.r !== 0))
-                }
-                break;
+            switch (r) {
+                case 0:
+                    if (!row0[c]) {
+                        //? modifico tablero
+                        setRow0(curr => {
+                            aux = [...curr]
+                            aux.splice(c, 1, auxSign)
+                            return aux
+                        })
+                        //? agrego movimiento del player/bot
+                        A.push(c)
+                        //? quito movimiento de la lista de disponibles para el bot
+                        emptyTiles.current = aux2.filter(t => (t.r === 0 && t.c !== c) || (t.r !== 0))
+                    }
+                    break;
 
-            case 1:
-                if (!row1[c]) {
-                    setRow1(curr => {
-                        aux = [...curr]
-                        aux.splice(c, 1, auxSign)
-                        return aux
-                    })
-                    B.push(c)
-                    emptyTiles.current = aux2.filter(t => (t.r === 1 && t.c !== c) || (t.r !== 1))
-                }
-                break;
+                case 1:
+                    if (!row1[c]) {
+                        setRow1(curr => {
+                            aux = [...curr]
+                            aux.splice(c, 1, auxSign)
+                            return aux
+                        })
+                        B.push(c)
+                        emptyTiles.current = aux2.filter(t => (t.r === 1 && t.c !== c) || (t.r !== 1))
+                    }
+                    break;
 
-            default:
-                if (!row2[c]) {
-                    setRow2(curr => {
-                        aux = [...curr]
-                        aux.splice(c, 1, auxSign)
-                        return aux
-                    })
-                    C.push(c)
-                    emptyTiles.current = aux2.filter(t => (t.r === 2 && t.c !== c) || (t.r !== 2))
-                }
-                break;
-        }
+                default:
+                    if (!row2[c]) {
+                        setRow2(curr => {
+                            aux = [...curr]
+                            aux.splice(c, 1, auxSign)
+                            return aux
+                        })
+                        C.push(c)
+                        emptyTiles.current = aux2.filter(t => (t.r === 2 && t.c !== c) || (t.r !== 2))
+                    }
+                    break;
+            }
 
-        if (player) {
-            setPlayerTurn(() => false)
-            postMove(true)
-        } else {
-            setPlayerTurn(() => myId)
-            postMove(false)
+            if (player) {
+                setPlayerTurn(() => false)
+                postMove(true)
+            } else {
+                setPlayerTurn(() => myId)
+                postMove(false)
+            }
+        } catch (error) {
+            console.log(error);
         }
     }
 
     const postMove = (player) => {
-        if (turn === 9) {
-            setTimeout(() => {
-                alert('Draw!')
-            }, 1000)
-            return
-        } else if (turn >= 3) {
+        if (turn >= 4) {
             let win = checkLine(player ? MOVES.current : BOTMOVES.current)
             if (win) {
-                setWaiting(true)
+                setPlayerTurn(false)
+
+                let score = {}
                 setScore(prev => {
-                    let aux = { ...prev }
-                    player ? aux.player = + 1 : aux.bot = + 1
-                    return aux
+                    score = { ...prev }
+                    player ? score.player += 1 : score.bot += 1
+                    return score
                 })
                 setTimeout(() => {
-                    if (Math.ceil(winCon / 2) === (player ? score.player : score.bot)) {
+                    console.log('win con.: ', winCon, 'score: ', (player ? score.player : score.bot));
+                    if ((player ? score.player : score.bot) >= winCon) {
                         alert(player ? 'You WIN!' : 'You LOSE...')
                         resetBoard(true, player ? false : myId)
                     } else {
                         alert(player ? 'You win this round!' : 'You lose this round...')
                         resetBoard(false, player ? false : myId)
                     }
-                    setWaiting(false)
+                }, 1000)
+                return
+            } else if (turn > 8) {
+                setTimeout(() => {
+                    alert('Draw!')
+                    resetBoard(false, player ? false : myId)
                 }, 1000)
                 return
             } else if (player) {
@@ -150,7 +157,6 @@ const RageAgainstTheMachine = () => {
         MOVES.current = { A: [], B: [], C: [] }
         BOTMOVES.current = { A: [], B: [], C: [] }
         emptyTiles.current = [{ r: 0, c: 0 }, { r: 0, c: 1 }, { r: 0, c: 2 }, { r: 1, c: 0 }, { r: 1, c: 1 }, { r: 1, c: 2 }, { r: 2, c: 0 }, { r: 2, c: 1 }, { r: 2, c: 2 }]
-        // setWaiting(false)
 
         if (fullReset) {
             setPlayerTurn(myId)
@@ -199,8 +205,8 @@ const RageAgainstTheMachine = () => {
                 : <div>
                     <span>Better of...</span>
                     <select name="betterOf" id="betterOfInput" onChange={(e) => setWinCon(e.target.value)}>
-                        <option value="3" defaultChecked>3</option>
-                        <option value="5">5</option>
+                        <option value="2" defaultChecked>3</option>
+                        <option value="3">5</option>
                     </select>
                     <br />
 
