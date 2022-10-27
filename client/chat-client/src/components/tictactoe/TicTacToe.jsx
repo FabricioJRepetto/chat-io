@@ -2,6 +2,8 @@ import React, { useState, useRef } from 'react'
 import { useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useCon } from '../../context'
+import Board from './Board'
+import { checkLine } from './utils/checkLine'
 import './TicTacToe.css'
 
 const TicTacToe = ({ socket }) => {
@@ -28,28 +30,6 @@ const TicTacToe = ({ socket }) => {
 
     //? MOVIMIENTOS DEL JUGADOR
     const MOVES = useRef({ A: [], B: [], C: [] })
-
-    const checkTicTacToe = () => {
-        const { A, B, C } = MOVES.current
-        if (A.length === 3 || B.length === 3 || C.length === 3) {
-            console.log('Horizontal win!')
-            return 'Horizontal win!'
-        } else if (A.includes(0) && B.includes(1) && C.includes(2)) {
-            console.log('Diagonal win!')
-            return 'Diagonal win!'
-        } else if (A.includes(2) && B.includes(1) && C.includes(0)) {
-            console.log('Diagonal win!')
-            return 'Diagonal win!'
-        } else {
-            for (let i = 0; i < 3; i++) {
-                if (A.includes(i) && B.includes(i) && C.includes(i)) {
-                    console.log('Vertical win!')
-                    return 'Vertical win!'
-                }
-            }
-        }
-        return false
-    }
 
     const tilePicker = ({ r, c }) => {
         setTurn(current => {
@@ -98,7 +78,7 @@ const TicTacToe = ({ socket }) => {
             return
 
         } else if (turn >= 3) {
-            let win = checkTicTacToe()
+            let win = checkLine(MOVES.current)
             if (win) {
                 //: desactivar el click del usuario
                 //: esperar la otro usuario para contunuar la partida
@@ -312,33 +292,15 @@ const TicTacToe = ({ socket }) => {
                             <div>Round: {rounds}</div>
                             <div>Turn: {turn}</div>
                         </>
+                        <Board row0={row0}
+                            row1={row1}
+                            row2={row2}
+                            tilePicker={tilePicker}
+                            sign={sign}
+                            myId={myId}
+                            currentTurn={currentTurn}
+                            waiting={waiting} />
 
-                        <div className='board'>
-                            <div>{
-                                row0.map((tile, i) => (
-                                    <div key={'r0' + i}
-                                        className="tile"
-                                        onClick={() => tilePicker({ r: 0, c: i, id: myId })}
-                                        style={{ backgroundColor: tile === sign ? '#3c5040' : 'transparent', pointerEvents: (currentTurn === myId && !tile && !waiting) ? 'all' : 'none' }}>{tile}</div>
-                                ))
-                            }</div>
-                            <div>{
-                                row1.map((tile, i) => (
-                                    <div key={'r1' + i}
-                                        className="tile"
-                                        onClick={() => tilePicker({ r: 1, c: i, id: myId })}
-                                        style={{ backgroundColor: tile === sign ? '#3c5040' : 'transparent', pointerEvents: (currentTurn === myId && !tile && !waiting) ? 'all' : 'none' }}>{tile}</div>
-                                ))
-                            }</div>
-                            <div>{
-                                row2.map((tile, i) => (
-                                    <div key={'r2' + i}
-                                        className="tile"
-                                        onClick={() => tilePicker({ r: 2, c: i, id: myId })}
-                                        style={{ backgroundColor: tile === sign ? '#3c5040' : 'transparent', pointerEvents: (currentTurn === myId && !tile && !waiting) ? 'all' : 'none' }}>{tile}</div>
-                                ))
-                            }</div>
-                        </div>
                     </div>
                     : <>
                         {users.length < 2

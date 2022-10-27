@@ -34,7 +34,7 @@ app.use(cors())
 app.use(morgan('dev'))
 
 io.on('connection', (socket) => {
-    console.log('user connected', socket.id)
+    console.log('+ user connected', socket.id)
     socket.emit('newConnection', { usersOnline, id: socket.id })
 
     //? CONNECTIONS
@@ -204,18 +204,21 @@ io.on('connection', (socket) => {
     })
     socket.on('leaveRoom', (room) => {
         try {
-            let aux = [...rooms[room].usersList]
-            aux = aux.filter(u => u.id !== socket.id)
-            rooms[room].usersList = [...aux]
+            console.log('- desconecta: ', socket.username);
+            if (rooms[room]) {
+                let aux = [...rooms[room].usersList]
+                aux = aux.filter(u => u.id !== socket.id)
+                rooms[room].usersList = [...aux]
 
-            socket.leave(room)
+                socket.leave(room)
 
-            if (rooms[room].usersList.length > 0) {
-                io.to(room).emit('leaveRoom', { message: `${socket.username} left the room`, users: aux })
-                // io.to(room).emit('roomUsersUpdate', { message: `${socket.username} left the room`, users: aux })
-            } else {
-                console.log(`Closing room ${room}`);
-                // delete rooms[room]
+                if (rooms[room].usersList.length > 0) {
+                    io.to(room).emit('leaveRoom', { message: `${socket.username} left the room`, users: aux })
+                    // io.to(room).emit('roomUsersUpdate', { message: `${socket.username} left the room`, users: aux })
+                } else {
+                    console.log(`Closing room ${room}`);
+                    delete rooms[room]
+                }
             }
         } catch (error) {
             console.log(error);
@@ -225,12 +228,12 @@ io.on('connection', (socket) => {
 
     //? DISCONNECT
     socket.on('disconnect', () => {
-        console.log('user disconnected', socket.id)
+        console.log('- user disconnected', socket.id)
         usersOnline = usersOnline.filter(u => u.id !== socket.id)
 
         socket.broadcast.emit('connectionsUpdate', { usersOnline })
         socket.broadcast.emit('newMessage', {
-            message: `${socket.username} letf the chat`,
+            message: `${socket.username} left the chat`,
             from: 'system'
         })
     })

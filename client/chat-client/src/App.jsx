@@ -10,6 +10,7 @@ import TicTacToe from './components/tictactoe/TicTacToe';
 import { useCon } from './context'
 
 import './App.css'
+import RageAgainstTheMachine from './components/tictactoe/RageAgainstTheMachine';
 // se conecta al socket
 const socket = io(BACK_URL)
 
@@ -72,8 +73,8 @@ function App() {
         try {
             // si el destinatario soy yo, abro el chat
             // y agrego el chat al context
-            console.log(myId.current);
-            if (m.to.id === myId.current) {
+            console.log(myId);
+            if (m.to.id === myId) {
                 let newDmChat = chats
                 if (chats[m.from.id]) {
                     newDmChat[m.from.id] = {
@@ -96,7 +97,7 @@ function App() {
 
             let aux = inboxes
             // si soy el emisor...
-            if (m.from.id === myId.current) {
+            if (m.from.id === myId) {
                 aux.get(m.to.id).messages.push(m)
             } else { // si soy el receptor...
                 if (aux.has(m.from.id)) {
@@ -180,7 +181,9 @@ function App() {
                                     <ChatContainer socket={socket} handleOpenInbox={handleOpenInbox} /> 
                                     <button onClick={() => navigate('/')}>home</button>
                                     */}
-                                        <br />
+                                        <p>Play against an evil machine</p>
+                                        <button onClick={() => navigate('/ia')}>START</button>
+                                        <p>...or play against a friend</p>
                                         <button onClick={newTTTRoom}>Create New Room</button>
                                         <button onClick={joinRoom}>Join Room</button>
                                         <input type="text"
@@ -202,6 +205,7 @@ function App() {
                             </>
                     }</div>
                 } ></Route>
+                <Route path='/ia' element={<RageAgainstTheMachine />}></Route>
                 <Route path='/game/:id' element={<TicTacToe socket={socket} />}></Route>
             </Routes>
 
