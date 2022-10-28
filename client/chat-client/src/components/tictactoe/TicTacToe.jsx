@@ -193,7 +193,7 @@ const TicTacToe = ({ socket }) => {
 
     const startMatch = () => {
         //: setear win condition, mejor de 3 || 5, no joda        
-        socket.emit('start', { room: roomid, winCon: Math.ceil(winCon / 2) })
+        socket.emit('start', { room: roomid, winCon })
     }
     const startHandler = () => {
         setPlaying(true)
