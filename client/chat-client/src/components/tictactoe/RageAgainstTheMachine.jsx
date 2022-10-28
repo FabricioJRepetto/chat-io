@@ -1,7 +1,8 @@
 import React, { useState, useRef } from 'react'
+import { useEffect } from 'react'
 import { useCon } from '../../context'
 import Board from './Board'
-import { botPlays } from './utils/bot'
+// import { botPlays } from './utils/bot'
 import { checkLine } from './utils/checkLine'
 
 const RageAgainstTheMachine = () => {
@@ -13,7 +14,7 @@ const RageAgainstTheMachine = () => {
     const [round, setRound] = useState(0)
     const [turn, setTurn] = useState(0)
     const [sign, setSign] = useState('X')
-    const [winCon, setWinCon] = useState(2)
+    const [winCon, setWinCon] = useState(3)
 
     //? TABLERO
     const [row0, setRow0] = useState([null, null, null])
@@ -37,6 +38,7 @@ const RageAgainstTheMachine = () => {
                 return aux
             })
 
+            player || console.log('/ / / / / / /');
             player || console.log(r, c);
 
             const { A, B, C } = player ? MOVES.current : BOTMOVES.current
@@ -50,11 +52,14 @@ const RageAgainstTheMachine = () => {
 
             switch (r) {
                 case 0:
+                    player || console.log(row0);
+                    player || console.log(!row0[c]);
                     if (!row0[c]) {
                         //? modifico tablero
                         setRow0(curr => {
                             aux = [...curr]
                             aux.splice(c, 1, auxSign)
+                            player || console.log('aux: ', aux);
                             return aux
                         })
                         //? agrego movimiento del player/bot
@@ -65,10 +70,13 @@ const RageAgainstTheMachine = () => {
                     break;
 
                 case 1:
+                    player || console.log(row1);
+                    player || console.log(!row1[c]);
                     if (!row1[c]) {
                         setRow1(curr => {
                             aux = [...curr]
                             aux.splice(c, 1, auxSign)
+                            player || console.log('aux: ', aux);
                             return aux
                         })
                         B.push(c)
@@ -77,10 +85,13 @@ const RageAgainstTheMachine = () => {
                     break;
 
                 default:
+                    player || console.log(row2);
+                    player || console.log(!row2[c]);
                     if (!row2[c]) {
                         setRow2(curr => {
                             aux = [...curr]
                             aux.splice(c, 1, auxSign)
+                            player || console.log('aux: ', aux);
                             return aux
                         })
                         C.push(c)
@@ -101,11 +112,23 @@ const RageAgainstTheMachine = () => {
         }
     }
 
+    const botPlays = () => {
+        const tiles = emptyTiles.current
+        let i = Math.floor(Math.random() * (tiles.length - 1))
+        i < 0 && (i = 0)
+
+        setTimeout(() => {
+            tilePicker(tiles[i], false)
+        }, 1500)
+
+        return
+    }
+
     const postMove = (player) => {
         if (turn >= 4) {
             let win = checkLine(player ? MOVES.current : BOTMOVES.current)
             if (win) {
-                setPlayerTurn(false)
+                setWaiting(true)
 
                 let score = {}
                 setScore(prev => {
@@ -114,7 +137,6 @@ const RageAgainstTheMachine = () => {
                     return score
                 })
                 setTimeout(() => {
-                    console.log('win con.: ', winCon, 'score: ', (player ? score.player : score.bot));
                     if ((player ? score.player : score.bot) >= winCon) {
                         alert(player ? 'You WIN!' : 'You LOSE...')
                         resetBoard(true, player ? false : myId)
@@ -126,27 +148,16 @@ const RageAgainstTheMachine = () => {
                 return
             } else if (turn > 8) {
                 setTimeout(() => {
+                    setWaiting(true)
                     alert('Draw!')
                     resetBoard(false, player ? false : myId)
                 }, 1000)
                 return
-            } else if (player) {
-                //: ejecutar bot
-                setTimeout(() => {
-                    tilePicker(botPlays(emptyTiles.current), false)
-                }, 1500);
-            } else {
-                setPlayerTurn(myId)
-            }
+            } else if (player) setPlayerTurn(false)
+            else setPlayerTurn(myId)
 
-        } else if (player) {
-            //: ejecutar bot
-            setTimeout(() => {
-                tilePicker(botPlays(emptyTiles.current), false)
-            }, 1500);
-        } else {
-            setPlayerTurn(myId)
-        }
+        } else if (player) setPlayerTurn(false)
+        else setPlayerTurn(myId)
     }
 
     const resetBoard = (fullReset, firstTurn) => {
@@ -164,16 +175,20 @@ const RageAgainstTheMachine = () => {
             setScore({ player: 0, bot: 0 })
             setPlaying(false)
         } else {
-            setPlayerTurn(firstTurn)
-            if (!firstTurn) {
-                let bot = botPlays(emptyTiles.current)
-                console.log(bot);
-                setTimeout(() => {
-                    tilePicker(bot, false)
-                }, 1500);
-            }
+            setWaiting(false)
+            setPlayerTurn(firstTurn) //: juega el bot            
         }
     }
+
+    const start = () => {
+        setWaiting(false)
+        setPlaying(true)
+    }
+
+    useEffect(() => {
+        (playing && !waiting && !playerTurn) && botPlays()
+        // eslint-disable-next-line
+    }, [row0, row1, row2])
 
     return (
         <>
@@ -203,10 +218,10 @@ const RageAgainstTheMachine = () => {
 
                 </div>
                 : <div>
-                    <span>Better of...</span>
+                    <span>Point to win...</span>
                     <select name="betterOf" id="betterOfInput" onChange={(e) => setWinCon(e.target.value)}>
-                        <option value="2" defaultChecked>3</option>
-                        <option value="3">5</option>
+                        <option value="3" defaultChecked>3</option>
+                        <option value="5">5</option>
                     </select>
                     <br />
 
@@ -217,7 +232,7 @@ const RageAgainstTheMachine = () => {
                     </select>
                     <br />
 
-                    <button onClick={() => setPlaying(true)}>START</button>
+                    <button onClick={start}>START</button>
                 </div>}
         </>
     )
