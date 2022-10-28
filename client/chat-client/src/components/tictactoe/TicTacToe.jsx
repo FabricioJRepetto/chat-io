@@ -121,36 +121,25 @@ const TicTacToe = ({ socket }) => {
 
         switch (r) {
             case 0:
-                console.log(!row0[c]);
-                if (!row0[c]) {
-                    setRow0((current) => {
-                        let aux = current
-                        aux[c] = sign
-                        return aux
-                    })
-                }
+                setRow0((current) => {
+                    let aux = current
+                    aux[c] = sign
+                    return aux
+                })
                 break;
-
             case 1:
-                console.log(!row1[c]);
-                if (!row1[c]) {
-                    setRow1((current) => {
-                        let aux = current
-                        aux[c] = sign
-                        return aux
-                    })
-                }
+                setRow1((current) => {
+                    let aux = current
+                    aux[c] = sign
+                    return aux
+                })
                 break;
-
             default:
-                console.log(!row2[c]);
-                if (!row2[c]) {
-                    setRow2((current) => {
-                        let aux = current
-                        aux[c] = sign
-                        return aux
-                    })
-                }
+                setRow2((current) => {
+                    let aux = current
+                    aux[c] = sign
+                    return aux
+                })
                 break;
         }
 
