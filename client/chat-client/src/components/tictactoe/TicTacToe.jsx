@@ -228,14 +228,14 @@ const TicTacToe = ({ socket }) => {
         navigate('/')
     }
 
-    useEffect(() => {
-        return () => {
-            //: se desconecta de la sala
-            //? el usuario cierra la tab, etc., etc.
-            socket.emit('leaveRoom', roomid)
-        }
-        // eslint-disable-next-line
-    }, [])
+    // useEffect(() => {
+    //     return () => {
+    //         //: se desconecta de la sala
+    //         //? el usuario cierra la tab, etc., etc.
+    //         socket.emit('leaveRoom', roomid)
+    //     }
+    //     // eslint-disable-next-line
+    // }, [])
 
 
     useEffect(() => {
@@ -260,6 +260,9 @@ const TicTacToe = ({ socket }) => {
             socket.off('start')
             socket.off('continue')
             socket.off('leaveRoom')
+            //: se desconecta de la sala
+            //? el usuario cierra la tab, etc., etc.
+            socket.emit('leaveRoom', roomid)
         }
         // eslint-disable-next-line
     }, [])
