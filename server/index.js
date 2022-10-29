@@ -37,6 +37,24 @@ io.on('connection', (socket) => {
     console.log('+ user connected', socket.id)
     socket.emit('newConnection', { usersOnline, id: socket.id })
 
+    const roomManager = (room) => {
+        if (rooms[room]) {
+            let aux = [...rooms[room]?.usersList]
+            aux = aux.filter(u => u.id !== socket.id)
+            rooms[room].usersList = [...aux]
+
+            socket.leave(room)
+
+            if (rooms[room]?.usersList.length > 0) {
+                io.to(room).emit('leaveRoom', { message: `${socket.username} left the room`, users: aux })
+                // io.to(room).emit('roomUsersUpdate', { message: `${socket.username} left the room`, users: aux })
+            } else {
+                console.log(`Closing room ${room}`);
+                delete rooms[room]
+            }
+        }
+    }
+
     //? CONNECTIONS
     // solo cuando el usuario elije un nickname
     // se muestra la conección y el mensaje
@@ -203,30 +221,15 @@ io.on('connection', (socket) => {
         }
     })
     socket.on('leaveRoom', (room) => {
-        try {
-            console.log('- desconecta: ', socket.username);
-            if (rooms[room]) {
-                let aux = [...rooms[room].usersList]
-                aux = aux.filter(u => u.id !== socket.id)
-                rooms[room].usersList = [...aux]
-
-                socket.leave(room)
-
-                if (rooms[room].usersList.length > 0) {
-                    io.to(room).emit('leaveRoom', { message: `${socket.username} left the room`, users: aux })
-                    // io.to(room).emit('roomUsersUpdate', { message: `${socket.username} left the room`, users: aux })
-                } else {
-                    console.log(`Closing room ${room}`);
-                    delete rooms[room]
-                }
-            }
-        } catch (error) {
-            console.log(error);
-        }
+        roomManager(room)
     })
 
-
     //? DISCONNECT
+    socket.on("disconnecting", () => {
+        socket.rooms.forEach(r => {
+            roomManager(r)
+        })
+    })
     socket.on('disconnect', () => {
         console.log('- user disconnected', socket.id)
         usersOnline = usersOnline.filter(u => u.id !== socket.id)

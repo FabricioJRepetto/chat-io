@@ -29,7 +29,17 @@ function contextReducer(state, action) {
 }
 
 function ContextProvider({ children }) {
-    const [state, dispatch] = useReducer(contextReducer, { users: [], inboxes: new Map(), chats: {}, username: '', myId: '', logged: false })
+    const [state, dispatch] = useReducer(
+        contextReducer,
+        {
+            users: [],
+            inboxes: new Map(),
+            chats: {},
+            username: '',
+            myId: '',
+            logged: false
+        }
+    )
     const value = { state, dispatch }
 
     return <ContextContext.Provider value={value}>{children}</ContextContext.Provider>

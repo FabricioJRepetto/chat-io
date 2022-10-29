@@ -4,10 +4,11 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useCon } from '../../context'
 import Board from './Board'
 import { checkLine } from './utils/checkLine'
+import UsernameInput from '../UsernameInput'
 import './TicTacToe.css'
 
 const TicTacToe = ({ socket }) => {
-    const { state: { myId, username } } = useCon()
+    const { state: { myId, username, logged } } = useCon()
     const { id: roomid } = useParams()
     const navigate = useNavigate()
     const [users, setUsers] = useState([])
@@ -213,27 +214,36 @@ const TicTacToe = ({ socket }) => {
 
     const leave = () => {
         //: se desconecta de la sala
-        socket.emit('leaveRoom', roomid)
+        //? el usuario presiona el boton "abandonar"
+        // socket.emit('leaveRoom', roomid)
         navigate('/')
     }
 
     const disconnect = ({ message }) => {
         //: se desconecta de la sala
+        //? el otro usuario abandona, 
+        //? el servidor nos dice que nos desconectemos
         alert(message)
-        socket.emit('leaveRoom', roomid)
+        // socket.emit('leaveRoom', roomid)
         navigate('/')
     }
 
     useEffect(() => {
-        //? se conecta a la sala
-        socket.emit('TTTRoom', roomid)
-
         return () => {
             //: se desconecta de la sala
+            //? el usuario cierra la tab, etc., etc.
             socket.emit('leaveRoom', roomid)
         }
         // eslint-disable-next-line
     }, [])
+
+
+    useEffect(() => {
+        //? se conecta a la sala
+        logged && socket.emit('TTTRoom', roomid)
+
+        // eslint-disable-next-line
+    }, [logged])
 
     useEffect(() => {
         socket.on('roomUpdate', (data) => roomUpdater(data))
@@ -260,57 +270,61 @@ const TicTacToe = ({ socket }) => {
             <h1>TicTacToe</h1>
             <h3>Room ID: {roomid}</h3>
             <button onClick={leave}>Leave room</button>
-            <button onClick={() => {
-                console.log(row0)
-                console.log(row1)
-                console.log(row2)
-            }}>Board</button>
-            <button onClick={() => console.log(otherPlayer.current)}>Player 2</button>
+            {!logged
+                ? <UsernameInput socket={socket} />
+                : <>
+                    <button onClick={() => {
+                        console.log(row0)
+                        console.log(row1)
+                        console.log(row2)
+                    }}>Board</button>
+                    <button onClick={() => console.log(otherPlayer.current)}>Player 2</button>
 
-            <div className='game-container'>
-                {playing
-                    ? <div className='playing'>
-                        <>
-                            <h2>{currentTurn === myId ? 'Your turn!' : 'Waiting for your oponents movement'}</h2>
-                            <div>{users[0].name}: {score[users[0].id] || 0}</div>
-                            <div>{users[1].name}: {score[users[1].id] || 0}</div>
-                            <div>Round: {rounds}</div>
-                            <div>Turn: {turn}</div>
-                        </>
-                        <Board row0={row0}
-                            row1={row1}
-                            row2={row2}
-                            tilePicker={tilePicker}
-                            sign={sign}
-                            myId={myId}
-                            currentTurn={currentTurn}
-                            waiting={waiting} />
+                    <div className='game-container'>
+                        {playing
+                            ? <div className='playing'>
+                                <>
+                                    <h2>{currentTurn === myId ? 'Your turn!' : 'Waiting for your oponents movement'}</h2>
+                                    <div>{users[0].name}: {score[users[0].id] || 0}</div>
+                                    <div>{users[1].name}: {score[users[1].id] || 0}</div>
+                                    <div>Round: {rounds}</div>
+                                    <div>Turn: {turn}</div>
+                                </>
+                                <Board row0={row0}
+                                    row1={row1}
+                                    row2={row2}
+                                    tilePicker={tilePicker}
+                                    sign={sign}
+                                    myId={myId}
+                                    currentTurn={currentTurn}
+                                    waiting={waiting} />
 
-                    </div>
-                    : <>
-                        {users.length < 2
-                            ? <h2>Waiting for a challenger...</h2>
-                            : <h2>{users[1].name} has join!</h2>}
-                        {users.find(u => u.id === myId && u.role === 'owner') &&
-                            <>
-                                <select name="betterOf" id="betterOfInput" onChange={(e) => setWinCon(e.target.value)}>
-                                    <option value="3" defaultChecked>3</option>
-                                    <option value="5">5</option>
-                                </select>
-                                <button onClick={startMatch}
-                                    disabled={users.length < 2}>START</button>
+                            </div>
+                            : <>
+                                {users.length < 2
+                                    ? <h2>Waiting for a challenger...</h2>
+                                    : <h2>{users[1].name} has join!</h2>}
+                                {users.find(u => u.id === myId && u.role === 'owner') &&
+                                    <>
+                                        <select name="betterOf" id="betterOfInput" onChange={(e) => setWinCon(e.target.value)}>
+                                            <option value="3" defaultChecked>3</option>
+                                            <option value="5">5</option>
+                                        </select>
+                                        <button onClick={startMatch}
+                                            disabled={users.length < 2}>START</button>
+                                    </>}
                             </>}
-                    </>}
-                <div className='room-user-list'>Usuarios: {
-                    users.length &&
-                    users.map(u => (
-                        <div key={u.id}>
-                            <b onClick={() => console.log(u.id)}>{u.name}</b>
-                            <i>{`(${u.role})`}</i>
-                        </div>
-                    ))
-                }</div>
-            </div>
+                        <div className='room-user-list'>Usuarios: {
+                            users.length &&
+                            users.map(u => (
+                                <div key={u.id}>
+                                    <b onClick={() => console.log(u.id)}>{u.name}</b>
+                                    <i>{`(${u.role})`}</i>
+                                </div>
+                            ))
+                        }</div>
+                    </div>
+                </>}
 
         </div>
     )
