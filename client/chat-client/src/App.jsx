@@ -163,7 +163,7 @@ function App() {
 
     return (
         <div className="App">
-            <h1>TicTacToe Beta v1.1</h1>
+            <h1>TicTacToe Beta v1.2</h1>
 
             <Routes>
                 <Route path="/" element={
