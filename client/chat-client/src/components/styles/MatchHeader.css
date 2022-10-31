@@ -1,0 +1,5 @@
+.header-container {
+    display: flex;
+    width: 100vw;
+    background: linear-gradient(90deg, rgba(55, 102, 141, 1) 25%, rgba(0, 0, 0, 0) 50%, rgba(246, 82, 101, 1) 75%);
+}

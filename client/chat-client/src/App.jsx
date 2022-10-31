@@ -2,22 +2,22 @@ import React, { useState, useEffect } from 'react'
 import { Routes, Route, useNavigate } from "react-router-dom";
 import io from 'socket.io-client'
 import { BACK_URL } from './constants'
+import { useCon } from './context'
 import UsernameInput from './components/UsernameInput'
-// import Contacts from './components/contacts/Contacts'
-// import ChatContainer from './components/ChatContainer'
+import MainMenu from './components/MainMenu';
 import DMChat from './components/dmChat/DMChat'
 import TicTacToe from './components/tictactoe/TicTacToe';
-import { useCon } from './context'
+import RageAgainstTheMachine from './components/tictactoe/RageAgainstTheMachine';
+// import Contacts from './components/contacts/Contacts'
+// import ChatContainer from './components/ChatContainer'
 
 import './App.css'
-import RageAgainstTheMachine from './components/tictactoe/RageAgainstTheMachine';
+
 // se conecta al socket
 const socket = io(BACK_URL)
 
 function App() {
-    const [roomIdInput, setRoomIdInput] = useState('')
     const [loading, setLoading] = useState(true)
-    const navigate = useNavigate()
     const { dispatch,
         state: {
             users,
@@ -148,61 +148,42 @@ function App() {
         // eslint-disable-next-line
     }, [])
 
-    const newTTTRoom = () => {
-        let roomid = Date.now().toString()
-        navigate(`/game/${roomid}`)
-    }
-
-    const joinRoom = () => {
-        if (roomIdInput.length === 13) {
-            navigate(`/game/${roomIdInput}`)
-        } else {
-            alert('Invalid ID')
-        }
-    }
-
     return (
         <div className="App">
-            <h1>TicTacToe Beta v1.1</h1>
+            <div className='watermark'>
+                <h1>TicTacToe Beta v1.1</h1>
+                <div className='divscontainer'>
+                    <div className="testdiv color1"></div>
+                    <div className="testdiv color2"></div>
+                    <div className="testdiv color3"></div>
+                    <div className="testdiv color4"></div>
+                    <div className="testdiv color5"></div>
+                </div>
+            </div>
 
             <Routes>
                 <Route path="/" element={
-                    <div>{
-                        loading
-                            ? <h2>connecting to server</h2>
-                            : <>
-                                {!logged
-                                    ? <>
-                                        <p>Users online: {users.length || 0}</p>
-                                        <UsernameInput socket={socket} />
-                                    </>
-                                    : <div className='container'>
-                                        {/* <Contacts handleOpenInbox={handleOpenInbox} />
-                                    <ChatContainer socket={socket} handleOpenInbox={handleOpenInbox} /> 
-                                    <button onClick={() => navigate('/')}>home</button>
-                                    */}
-                                        <p>Play against an evil machine</p>
-                                        <button onClick={() => navigate('/ia')}>START</button>
-                                        <p>...or play against a friend</p>
-                                        <button onClick={newTTTRoom}>Create New Room</button>
-                                        <button onClick={joinRoom}>Join Room</button>
-                                        <input type="text"
-                                            placeholder='Room ID'
-                                            value={roomIdInput}
-                                            onChange={(e) => setRoomIdInput(e.target.value)} />
-                                    </div>}
+                    <div>{loading
+                        ? <h2>connecting to server</h2>
+                        : <>
+                            {!logged
+                                ? <>
+                                    <p>Users online: {users.length || 0}</p>
+                                    <UsernameInput socket={socket} />
+                                </>
+                                : <MainMenu />}
 
-                                {(chats) &&
-                                    Object.entries(chats).map(([k, v]) => (
-                                        v.open &&
-                                        <DMChat key={k + myId}
-                                            user={{ id: k, name: v.name }}
-                                            socket={socket}
-                                            handleSendPrivate={handleSendPrivate}
-                                        />
-                                    ))
-                                }
-                            </>
+                            {(chats) &&
+                                Object.entries(chats).map(([k, v]) => (
+                                    v.open &&
+                                    <DMChat key={k + myId}
+                                        user={{ id: k, name: v.name }}
+                                        socket={socket}
+                                        handleSendPrivate={handleSendPrivate}
+                                    />
+                                ))
+                            }
+                        </>
                     }</div>
                 } ></Route>
                 <Route path='/ia' element={<RageAgainstTheMachine />}></Route>

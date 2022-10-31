@@ -2,8 +2,10 @@ import React, { useState, useRef } from 'react'
 import { useEffect } from 'react'
 import { useCon } from '../../context'
 import Board from './Board'
+import { MatchHeader } from './MatchHeader'
 // import { botPlays } from './utils/bot'
 import { checkLine } from './utils/checkLine'
+import SelectMenu from './utils/SelectMenu'
 
 const RageAgainstTheMachine = () => {
     const { state: { myId } } = useCon()
@@ -175,8 +177,9 @@ const RageAgainstTheMachine = () => {
             setScore({ player: 0, bot: 0 })
             setPlaying(false)
         } else {
+            setRound(prev => prev + 1)
             setWaiting(false)
-            setPlayerTurn(firstTurn) //: juega el bot            
+            setPlayerTurn(firstTurn)
         }
     }
 
@@ -194,19 +197,18 @@ const RageAgainstTheMachine = () => {
         <>
             {playing
                 ? <div className='playing'>
-                    <>
-                        <h2>{playerTurn ? 'Your turn!' : 'Waiting for your oponents movement'}</h2>
-                        <div>You: {score.player || 0}</div>
-                        <div>Roboto: {score.bot || 0}</div>
-                        <div>Round: {round}</div>
+                    <MatchHeader
+                        score={score}
+                        round={round}
+                        playerTurn={playerTurn} />
+                    {/* 
                         <div>Turn: {turn}</div>
                         <button onClick={() => {
                             console.log(row0)
                             console.log(row1)
                             console.log(row2)
                         }}>Board</button>
-                        <button onClick={() => console.log(emptyTiles.current)}>empty tiles</button>
-                    </>
+                        <button onClick={() => console.log(emptyTiles.current)}>empty tiles</button> */}
                     <Board row0={row0}
                         row1={row1}
                         row2={row2}
@@ -217,22 +219,17 @@ const RageAgainstTheMachine = () => {
                         waiting={waiting} />
 
                 </div>
-                : <div>
-                    <span>Point to win...</span>
-                    <select name="betterOf" id="betterOfInput" onChange={(e) => setWinCon(e.target.value)}>
-                        <option value="3" defaultChecked>3</option>
-                        <option value="5">5</option>
-                    </select>
-                    <br />
+                : <div className='IAmenu'>
+                    <SelectMenu
+                        name={'Points to win'}
+                        options={[3, 5]}
+                        setOption={setWinCon} />
+                    <SelectMenu
+                        name={'Select your sign'}
+                        options={['X', 'O']}
+                        setOption={setSign} />
 
-                    <span>Select a sign...</span>
-                    <select name="PlayerSign" id="PlayerSignInput" onChange={(e) => setSign(e.target.value)}>
-                        <option value="X" defaultChecked>X</option>
-                        <option value="O">O</option>
-                    </select>
-                    <br />
-
-                    <button onClick={start}>START</button>
+                    <p className='p-txt menu-opt' onClick={start}>START</p>
                 </div>}
         </>
     )

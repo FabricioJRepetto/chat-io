@@ -1,8 +1,13 @@
 #root {
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 2rem;
     text-align: center;
+}
+
+.App {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
 }
 
 .container {
@@ -16,7 +21,7 @@
     height: 50vh;
     width: 60vw;
     min-width: 450px;
-    border: 1px solid #FFFFFF;
+    border: 1px solid var(--white);
     overflow-y: scroll;
 }
 
@@ -25,7 +30,7 @@
     min-width: 30%;
     text-align: left;
     align-self: flex-start;
-    color: rgb(255, 255, 255);
+    color: var(--white);
     background-color: #303030;
     border-radius: 0 .5rem .5rem 0;
     margin: none;
@@ -41,7 +46,7 @@
     min-width: 30%;
     text-align: left;
     align-self: flex-end;
-    color: rgb(255, 255, 255);
+    color: var(--white);
     background-color: #151f2e;
     border-radius: .5rem 0 0 .5rem;
     margin: none;
@@ -51,4 +56,96 @@
 .sys-message {
     width: 100%;
     color: rgb(128, 128, 128);
+}
+
+/* GLOBALES */
+.p-txt {
+    color: var(--white);
+}
+
+.s-txt {
+    color: var(--secondary);
+}
+
+.err-txt {
+    color: var(--red);
+}
+
+/* MAIN MENU */
+.mainmenu-container {
+    display: flex;
+    flex-direction: column;
+    height: 24rem;
+}
+
+.menu-opt {
+    font-weight: 600;
+    font-size: 4rem;
+    line-height: 100%;
+    margin: .2em;
+    cursor: pointer;
+    margin-block-start: 0;
+    margin-block-end: 0;
+}
+
+.menu-opt:hover {
+    color: var(--red);
+}
+
+.room-id-input {
+    overflow: hidden;
+    height: 0rem;
+    transition: height .5s ease;
+}
+
+.room-id-input-open {
+    height: 5rem;
+}
+
+/* VS IA */
+.IAmenu {
+    display: flex;
+    flex-direction: column;
+}
+
+.IAmenu>p {
+    margin-top: 4rem;
+}
+
+/* TESTING */
+.watermark {
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+}
+
+.divscontainer {
+    display: flex;
+    border: 4px solid white;
+    width: fit-content;
+}
+
+.testdiv {
+    height: 2rem;
+    width: 2rem;
+}
+
+.color1 {
+    background-color: var(--black);
+}
+
+.color2 {
+    background-color: var(--white);
+}
+
+.color3 {
+    background-color: var(--secondary);
+}
+
+.color4 {
+    background-color: var(--red);
+}
+
+.color5 {
+    background-color: var(--blue);
 }

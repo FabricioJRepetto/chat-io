@@ -1,0 +1,49 @@
+.selectmenu-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 2rem;
+    margin: .25rem 0 .25rem 0;
+    font-size: 1.25rem;
+    border-bottom: 1px solid var(--secondary);
+    position: relative;
+    overflow: visible;
+    user-select: none;
+    cursor: pointer;
+}
+
+.selectmenu-container>p {
+    color: var(--secondary);
+}
+
+.selectmenu-menu {
+    position: absolute;
+    top: 2rem;
+    left: 0;
+    height: 0rem;
+    width: 100%;
+    background-color: var(--black);
+    pointer-events: none;
+    visibility: hidden;
+    overflow: hidden;
+    z-index: 10;
+    transition: height .2s ease;
+}
+
+.selectmenu-menu-open {
+    height: 3rem;
+    visibility: visible;
+    pointer-events: all;
+    border: 1px solid var(--secondary);
+    border-top: 1px solid transparent;
+}
+
+.selectmenu-menu p {
+    color: var(--secondary);
+    margin-block-start: 0;
+    margin-block-end: 0;
+}
+
+.selectmenu-menu p:hover {
+    color: var(--white);
+}
