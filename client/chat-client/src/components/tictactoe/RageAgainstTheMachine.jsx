@@ -225,7 +225,7 @@ const RageAgainstTheMachine = () => {
                         options={[3, 5]}
                         setOption={setWinCon} />
                     <SelectMenu
-                        name={'Select your sign'}
+                        name={'Pick your sign'}
                         options={['X', 'O']}
                         setOption={setSign} />
 

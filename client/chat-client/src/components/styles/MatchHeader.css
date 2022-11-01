@@ -1,5 +1,43 @@
 .header-container {
+    position: relative;
     display: flex;
+    justify-content: space-between;
+    align-items: center;
     width: 100vw;
-    background: linear-gradient(90deg, rgba(55, 102, 141, 1) 25%, rgba(0, 0, 0, 0) 50%, rgba(246, 82, 101, 1) 75%);
+    height: 7rem;
+    margin-bottom: 3rem;
+    background: linear-gradient(90deg, rgba(55, 102, 141, 1) 15%, rgba(0, 0, 0, 0) 50%, rgba(246, 82, 101, 1) 85%);
+}
+
+.header-container>h2 {
+    position: absolute;
+    bottom: -3.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.header-txt {
+    font-size: 5rem;
+}
+
+.your-score {
+    padding-left: 1.5rem;
+}
+
+.their-score {
+    padding-right: 1.5rem;
+}
+
+.current-round {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 7rem;
+    width: 10rem;
+    font-size: 5rem;
+    color: var(--black);
+    background-color: var(--white);
 }

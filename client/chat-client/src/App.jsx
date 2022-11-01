@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Routes, Route, useNavigate } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import io from 'socket.io-client'
 import { BACK_URL } from './constants'
 import { useCon } from './context'

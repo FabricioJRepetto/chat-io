@@ -14,6 +14,12 @@
 
 .selectmenu-container>p {
     color: var(--secondary);
+    margin-left: 1rem;
+}
+
+.selectmenu-container p+div {
+    display: flex;
+    align-items: center;
 }
 
 .selectmenu-menu {

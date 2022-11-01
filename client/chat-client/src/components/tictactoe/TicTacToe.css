@@ -11,20 +11,6 @@
 
 }
 
-.tile {
-    height: 10rem;
-    width: 10rem;
-    border: 1px solid black;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    font-size: 8rem;
-}
-
-.tile:hover {
-    background-color: #303030 !important;
-}
 
 .game-container {
     display: flex;

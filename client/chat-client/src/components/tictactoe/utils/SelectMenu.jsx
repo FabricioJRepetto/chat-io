@@ -1,4 +1,6 @@
 import React, { useState } from 'react'
+import Arrow from '../../../assets/Arrow'
+
 import '../../styles/SelectMenu.css'
 
 const SelectMenu = (props) => {
@@ -23,7 +25,10 @@ const SelectMenu = (props) => {
     return (
         <div className='selectmenu-container' onClick={menuHandler}>
             <p>{name}</p>
-            <span>{`${currentOption} ▼`}</span>
+            <div>
+                <span>{`${currentOption}`}</span>
+                <Arrow />
+            </div>
 
             <div className={`selectmenu-menu ${open && 'selectmenu-menu-open'}`}>{options.length &&
                 options.map(o => (

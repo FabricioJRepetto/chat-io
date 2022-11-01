@@ -1,0 +1,62 @@
+.board-container {
+    display: flex;
+    justify-content: center;
+    position: relative;
+}
+
+.board-grids {
+    position: absolute;
+    height: 30rem;
+    width: 30rem;
+    pointer-events: none;
+}
+
+.horizontal-line {
+    position: absolute;
+    height: 2px;
+    width: 100%;
+    background-color: var(--white);
+}
+
+.vertical-line {
+    position: absolute;
+    height: 100%;
+    width: 2px;
+    background-color: var(--white);
+}
+
+.hl1 {
+    top: 33.33%;
+}
+
+.hl2 {
+    top: 66.66%;
+}
+
+.vl1 {
+    left: 33.33%;
+}
+
+.vl2 {
+    left: 66.66%;
+}
+
+.board {
+    width: fit-content;
+}
+
+.tile {
+    height: 10rem;
+    width: 10rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 8rem;
+    transition: background-color .5s ease;
+}
+
+.tile:hover {
+    background-color: #5A706020 !important;
+    transition: background-color .2s ease;
+}
