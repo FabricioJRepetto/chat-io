@@ -40,9 +40,6 @@ const RageAgainstTheMachine = () => {
                 return aux
             })
 
-            player || console.log('/ / / / / / /');
-            player || console.log(r, c);
-
             const { A, B, C } = player ? MOVES.current : BOTMOVES.current
             let aux = [],
                 aux2 = [...emptyTiles.current],
@@ -54,8 +51,6 @@ const RageAgainstTheMachine = () => {
 
             switch (r) {
                 case 0:
-                    player || console.log(row0);
-                    player || console.log(!row0[c]);
                     if (!row0[c]) {
                         //? modifico tablero
                         setRow0(curr => {
@@ -72,8 +67,6 @@ const RageAgainstTheMachine = () => {
                     break;
 
                 case 1:
-                    player || console.log(row1);
-                    player || console.log(!row1[c]);
                     if (!row1[c]) {
                         setRow1(curr => {
                             aux = [...curr]
@@ -87,8 +80,6 @@ const RageAgainstTheMachine = () => {
                     break;
 
                 default:
-                    player || console.log(row2);
-                    player || console.log(!row2[c]);
                     if (!row2[c]) {
                         setRow2(curr => {
                             aux = [...curr]

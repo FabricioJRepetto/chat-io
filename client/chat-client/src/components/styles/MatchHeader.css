@@ -6,7 +6,8 @@
     width: 100vw;
     height: 7rem;
     margin-bottom: 3rem;
-    background: linear-gradient(90deg, rgba(55, 102, 141, 1) 15%, rgba(0, 0, 0, 0) 50%, rgba(246, 82, 101, 1) 85%);
+    background: linear-gradient(90deg, var(--blue) 15%, rgba(0, 0, 0, 0) 50%, var(--red) 85%);
+    overflow-y: hidden;
 }
 
 .header-container>h2 {
@@ -40,4 +41,36 @@
     font-size: 5rem;
     color: var(--black);
     background-color: var(--white);
+}
+
+.turn-sign {
+
+    position: absolute;
+    font-size: clamp(24px, 10vw, 15rem);
+    line-height: 75%;
+    height: fit-content;
+    width: 10rem;
+    left: 50%;
+    bottom: -125%;
+    transform: translate(-50%) rotate(45deg);
+    margin: 0;
+    text-justify: center;
+    color: var(--white);
+    opacity: 0;
+    z-index: 10;
+    transition: all .3s ease;
+}
+
+.p1-sign {
+    opacity: 1;
+    bottom: -30%;
+    left: 35%;
+    transform: rotate(-15deg);
+}
+
+.p2-sign {
+    opacity: 1;
+    bottom: -30%;
+    left: 65%;
+    transform: rotate(15deg);
 }
