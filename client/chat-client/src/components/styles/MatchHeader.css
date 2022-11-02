@@ -44,20 +44,20 @@
 }
 
 .turn-sign {
-
     position: absolute;
-    font-size: clamp(24px, 10vw, 15rem);
-    line-height: 75%;
-    height: fit-content;
-    width: 10rem;
     left: 50%;
     bottom: -125%;
-    transform: translate(-50%) rotate(45deg);
+    width: 10rem;
+    height: fit-content;
     margin: 0;
+    line-height: 75%;
+    font-size: clamp(24px, 10vw, 15rem);
+    transform: translate(-50%) rotate(45deg);
     text-justify: center;
     color: var(--white);
     opacity: 0;
     z-index: 10;
+    user-select: none;
     transition: all .3s ease;
 }
 

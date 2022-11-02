@@ -5,6 +5,8 @@ import { useCon } from '../../context'
 import Board from './Board'
 import { checkLine } from './utils/checkLine'
 import UsernameInput from '../UsernameInput'
+import SelectMenu from './utils/SelectMenu'
+import { MatchHeader } from './MatchHeader'
 import './TicTacToe.css'
 
 const TicTacToe = ({ socket }) => {
@@ -270,30 +272,23 @@ const TicTacToe = ({ socket }) => {
 
     return (
         <div>
-            <h1>TicTacToe</h1>
-            <h3>Room ID: {roomid}</h3>
-            <button onClick={leave}>Leave room</button>
+            <button onClick={leave}>Leave</button>
             {!logged
                 ? <UsernameInput socket={socket} />
                 : <>
-                    <button onClick={() => {
-                        console.log(row0)
-                        console.log(row1)
-                        console.log(row2)
-                    }}>Board</button>
-                    <button onClick={() => console.log(otherPlayer.current)}>Player 2</button>
-
                     <div className='game-container'>
                         {playing
                             ? <div className='playing'>
-                                <>
-                                    <h2>{currentTurn === myId ? 'Your turn!' : 'Waiting for your oponents movement'}</h2>
-                                    <div>{users[0].name}: {score[users[0].id] || 0}</div>
-                                    <div>{users[1].name}: {score[users[1].id] || 0}</div>
-                                    <div>Round: {rounds}</div>
-                                    <div>Turn: {turn}</div>
-                                </>
-                                <Board row0={row0}
+                                <MatchHeader
+                                    sign={sign}
+                                    score={score}
+                                    round={rounds}
+                                    playerTurn={currentTurn === myId}
+                                    users={users}
+                                    playerId={myId} />
+
+                                <Board
+                                    row0={row0}
                                     row1={row1}
                                     row2={row2}
                                     tilePicker={tilePicker}
@@ -304,29 +299,32 @@ const TicTacToe = ({ socket }) => {
 
                             </div>
                             : <>
-                                {users.length < 2
-                                    ? <h2>Waiting for a challenger...</h2>
-                                    : <h2>{users[1].name} has join!</h2>}
                                 {users.find(u => u.id === myId && u.role === 'owner') &&
-                                    <>
-                                        <select name="betterOf" id="betterOfInput" onChange={(e) => setWinCon(e.target.value)}>
-                                            <option value="3" defaultChecked>3</option>
-                                            <option value="5">5</option>
-                                        </select>
+                                    <div className='pvp-menu'>
+                                        <SelectMenu
+                                            name={'Points to win'}
+                                            options={[3, 5]}
+                                            setOption={setWinCon} />
+
+                                        {users.length < 2
+                                            ? <p>Waiting for a challenger...</p>
+                                            : <p>{users[1].name} has join!</p>}
                                         <button onClick={startMatch}
                                             disabled={users.length < 2}>START</button>
-                                    </>}
+                                    </div>}
                             </>}
-                        <div className='room-user-list'>Usuarios: {
-                            users.length &&
-                            users.map(u => (
-                                <div key={u.id}>
-                                    <b onClick={() => console.log(u.id)}>{u.name}</b>
-                                    <i>{`(${u.role})`}</i>
-                                </div>
-                            ))
-                        }</div>
                     </div>
+
+                    <div className='room-user-list'>Usuarios: {
+                        users.length &&
+                        users.map(u => (
+                            <div key={u.id}>
+                                <b onClick={() => console.log(u.id)}>{u.name}</b>
+                                <i>{`(${u.role})`}</i>
+                            </div>
+                        ))
+                    }</div>
+                    <h3>Room ID: {roomid}</h3>
                 </>}
 
         </div>

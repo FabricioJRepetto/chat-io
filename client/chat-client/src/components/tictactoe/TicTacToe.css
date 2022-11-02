@@ -8,11 +8,13 @@
     grid-template-rows: 10rem 10rem 10rem;
     grid-template-columns: 10rem 10rem 10rem; */
     display: flex;
-
 }
-
 
 .game-container {
     display: flex;
+}
 
+.pvp-menu {
+    display: flex;
+    flex-direction: column;
 }

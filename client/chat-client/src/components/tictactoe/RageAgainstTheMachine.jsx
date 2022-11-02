@@ -189,17 +189,11 @@ const RageAgainstTheMachine = () => {
             {playing
                 ? <div className='playing'>
                     <MatchHeader
+                        sign={sign}
                         score={score}
                         round={round}
                         playerTurn={playerTurn} />
-                    {/* 
-                        <div>Turn: {turn}</div>
-                        <button onClick={() => {
-                            console.log(row0)
-                            console.log(row1)
-                            console.log(row2)
-                        }}>Board</button>
-                        <button onClick={() => console.log(emptyTiles.current)}>empty tiles</button> */}
+
                     <Board row0={row0}
                         row1={row1}
                         row2={row2}
