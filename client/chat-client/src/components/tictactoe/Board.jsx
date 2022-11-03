@@ -11,7 +11,8 @@ const Board = (props) => {
         sign,
         myId,
         currentTurn,
-        waiting
+        waiting,
+        winStyle
     } = props
 
     return (
@@ -21,12 +22,14 @@ const Board = (props) => {
                 <div className='horizontal-line hl2'></div>
                 <div className='vertical-line vl1'></div>
                 <div className='vertical-line vl2'></div>
+
+                {winStyle && <div className='winningLine' style={winStyle} ></div>}
             </div>
             <div className='board'>
                 <div>{
                     row0.map((tile, i) => (
                         <div key={'r0' + i}
-                            className="tile"
+                            className={`tile ${tile && 'tile-mark-anim'}`}
                             onClick={() => tilePicker({ r: 0, c: i, id: myId })}
                             style={{ backgroundColor: tile === sign ? '#5A7060' : 'transparent', pointerEvents: (currentTurn === myId && !tile && !waiting) ? 'all' : 'none' }}>{tile}</div>
                     ))
@@ -34,7 +37,7 @@ const Board = (props) => {
                 <div>{
                     row1.map((tile, i) => (
                         <div key={'r1' + i}
-                            className="tile"
+                            className={`tile ${tile && 'tile-mark-anim'}`}
                             onClick={() => tilePicker({ r: 1, c: i, id: myId })}
                             style={{ backgroundColor: tile === sign ? '#5A7060' : 'transparent', pointerEvents: (currentTurn === myId && !tile && !waiting) ? 'all' : 'none' }}>{tile}</div>
                     ))
@@ -42,7 +45,7 @@ const Board = (props) => {
                 <div>{
                     row2.map((tile, i) => (
                         <div key={'r2' + i}
-                            className="tile"
+                            className={`tile ${tile && 'tile-mark-anim'}`}
                             onClick={() => tilePicker({ r: 2, c: i, id: myId })}
                             style={{ backgroundColor: tile === sign ? '#5A7060' : 'transparent', pointerEvents: (currentTurn === myId && !tile && !waiting) ? 'all' : 'none' }}>{tile}</div>
                     ))

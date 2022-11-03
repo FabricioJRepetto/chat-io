@@ -17,6 +17,7 @@ const RageAgainstTheMachine = () => {
     const [turn, setTurn] = useState(0)
     const [sign, setSign] = useState('X')
     const [winCon, setWinCon] = useState(3)
+    const [winStyle, setWinStyle] = useState(false)
 
     //? TABLERO
     const [row0, setRow0] = useState([null, null, null])
@@ -131,11 +132,27 @@ const RageAgainstTheMachine = () => {
                 })
                 setTimeout(() => {
                     if ((player ? score.player : score.bot) >= winCon) {
-                        alert(player ? 'You WIN!' : 'You LOSE...')
-                        resetBoard(true, player ? false : myId)
+                        //: winning style setter
+                        setWinStyle(() => {
+                            let aux = { ...win }
+                            aux.backgroundColor = `${player ? '#37668d' : '#F65265'}`
+                            return aux
+                        })
+                        setTimeout(() => {
+                            alert(player ? 'You WIN!' : 'You LOSE...')
+                            resetBoard(true, player ? false : myId)
+                        }, 1000);
                     } else {
-                        alert(player ? 'You win this round!' : 'You lose this round...')
-                        resetBoard(false, player ? false : myId)
+                        //: winning style setter
+                        setWinStyle(() => {
+                            let aux = { ...win }
+                            aux.backgroundColor = `${player ? '#37668d' : '#F65265'}`
+                            return aux
+                        })
+                        setTimeout(() => {
+                            alert(player ? 'You win this round!' : 'You lose this round...')
+                            resetBoard(false, player ? false : myId)
+                        }, 1000);
                     }
                 }, 1000)
                 return
@@ -154,6 +171,7 @@ const RageAgainstTheMachine = () => {
     }
 
     const resetBoard = (fullReset, firstTurn) => {
+        setWinStyle(false)
         setTurn(1)
         setRow0([null, null, null])
         setRow1([null, null, null])
@@ -201,7 +219,8 @@ const RageAgainstTheMachine = () => {
                         sign={sign}
                         myId={myId}
                         currentTurn={playerTurn}
-                        waiting={waiting} />
+                        waiting={waiting}
+                        winStyle={winStyle} />
 
                 </div>
                 : <div className='IAmenu'>
