@@ -17,6 +17,7 @@ const TicTacToe = ({ socket }) => {
     const otherPlayer = useRef(false)
     const [sign, setSign] = useState('O')
     const [winCon, setWinCon] = useState(3)
+    const [winStyle, setWinStyle] = useState(false)
 
     const [playing, setPlaying] = useState(false)
     const [waiting, setWaiting] = useState(false)
@@ -79,7 +80,7 @@ const TicTacToe = ({ socket }) => {
                 //: desactivar el click del usuario
                 //: esperar la otro usuario para contunuar la partida
                 setWaiting(true)
-                socket.emit('roundEnd', { room: roomid, type: 'winner', m: { r, c, id: myId, roundEnd: `YOU LOSE THIS ROUND...` } })
+                socket.emit('roundEnd', { room: roomid, type: 'winner', m: { r, c, id: myId, roundEnd: `YOU LOSE THIS ROUND...`, win } })
             } else if (turn > 8) {
                 //: emit draw y actualizar data de la partida
                 socket.emit('roundEnd', { room: roomid, type: 'draw', m: { r, c, id: myId, roundEnd: `DRAW` } })
@@ -93,8 +94,14 @@ const TicTacToe = ({ socket }) => {
     }
 
     //? MOVIMIENTO DEL OTRO JUGADOR
-    const movementSync = ({ r, c, id, roundEnd = false, final = false }) => {
+    const movementSync = ({ r, c, id, roundEnd = false, final = false, win = false }) => {
         if (id === myId) {
+            if (win) {
+                setWinStyle(() => {
+                    let aux = { ...win, backgroundColor: '#37668d' }
+                    return aux
+                })
+            }
             //: notifica si gana el originador del movimiento
             if (final) {
                 setTimeout(() => {
@@ -146,8 +153,14 @@ const TicTacToe = ({ socket }) => {
                 break;
         }
 
+        if (win) {
+            setWinStyle(() => {
+                let aux = { ...win, backgroundColor: '#F65265' }
+                return aux
+            })
+        }
+
         if (final) {
-            //: modal final del juego
             setTimeout(() => {
                 alert(`THE WINNER IS ${otherPlayer.current.name}`)
                 setPlaying(false)
@@ -157,14 +170,10 @@ const TicTacToe = ({ socket }) => {
         }
 
         if (roundEnd) {
-            // if es un player
             setTimeout(() => {
-                //: modal final de round
                 alert(roundEnd)
-                //: reset
                 resetBoard()
             }, 1000);
-            // else alert(`${winner} WINS!`)
         }
 
         setCurrentTurn(() => myId)
@@ -173,6 +182,7 @@ const TicTacToe = ({ socket }) => {
     const resetBoard = () => {
         //: avisar al back que estoy listo
         socket.emit('playerReady', { room: roomid, id: myId })
+        setWinStyle(() => false)
         setTurn(1)
         setRow0([null, null, null])
         setRow1([null, null, null])
@@ -295,7 +305,8 @@ const TicTacToe = ({ socket }) => {
                                     sign={sign}
                                     myId={myId}
                                     currentTurn={currentTurn}
-                                    waiting={waiting} />
+                                    waiting={waiting}
+                                    winStyle={winStyle} />
 
                             </div>
                             : <>

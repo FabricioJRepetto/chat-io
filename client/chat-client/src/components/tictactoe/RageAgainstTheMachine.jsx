@@ -134,9 +134,7 @@ const RageAgainstTheMachine = () => {
                     if ((player ? score.player : score.bot) >= winCon) {
                         //: winning style setter
                         setWinStyle(() => {
-                            let aux = { ...win }
-                            aux.backgroundColor = `${player ? '#37668d' : '#F65265'}`
-                            return aux
+                            return { ...win, backgroundColor: `${player ? '#37668d' : '#F65265'}` }
                         })
                         setTimeout(() => {
                             alert(player ? 'You WIN!' : 'You LOSE...')
@@ -145,9 +143,7 @@ const RageAgainstTheMachine = () => {
                     } else {
                         //: winning style setter
                         setWinStyle(() => {
-                            let aux = { ...win }
-                            aux.backgroundColor = `${player ? '#37668d' : '#F65265'}`
-                            return aux
+                            return { ...win, backgroundColor: `${player ? '#37668d' : '#F65265'}` }
                         })
                         setTimeout(() => {
                             alert(player ? 'You win this round!' : 'You lose this round...')
