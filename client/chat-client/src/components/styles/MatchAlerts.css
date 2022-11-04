@@ -12,26 +12,56 @@
     justify-content: center;
     align-items: center;
 
-    background-color: #00000025;
-    transition: opacity .2s ease;
+    background-color: #00000035;
 }
 
 .mA-open {
     visibility: visible;
     opacity: 1;
+    animation: 2s ease alertDefault;
+}
+
+@keyframes alertDefault {
+    0% {
+        opacity: 0
+    }
+
+    10% {
+        opacity: 1
+    }
+
+    90% {
+        opacity: 1
+    }
+
+    100% {
+        opacity: 0
+    }
 }
 
 .mAlert-content {
     width: 100%;
     max-width: fit-content;
     height: fit-content;
-    background-color: var(--blue);
+    background-color: var(--secondary);
     font-size: clamp(24px, 15vw, 15vw);
     line-height: normal;
 }
 
-.mAlert-win {}
+.mAlert-finalW {
+    background-color: var(--blue);
+}
 
-.mAlert-lose {}
+.mAlert-finalL {
+    background-color: var(--red);
+}
+
+.mAlert-win {
+    font-size: clamp(24px, 7.5vw, 7.5vw);
+}
+
+.mAlert-lose {
+    font-size: clamp(24px, 7.5vw, 7.5vw);
+}
 
 .mAlert-draw {}

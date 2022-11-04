@@ -6,31 +6,30 @@ const MatchAlerts = ({ isOpen, closeAlert, props = false }) => {
 
     const {
         type,
-        name,
+        message,
         duration
     } = props
 
     const handleModalContainerClick = (e) => {
         e.stopPropagation();
     };
-    let clickTargetID = null;
+    // let clickTargetID = null;
 
-    const handleOnMouseDown = (e) => {
-        e.stopPropagation();
-        clickTargetID = e.target.id;
-    };
+    // const handleOnMouseDown = (e) => {
+    //     e.stopPropagation();
+    //     clickTargetID = e.target.id;
+    // };
 
-    const handleOnMouseUp = (e) => {
-        e.stopPropagation();
-        if (e.target.id === clickTargetID && clickTargetID === "modal-article") {
-            closeAlert();
-        }
-        clickTargetID = null;
-    };
+    // const handleOnMouseUp = (e) => {
+    //     e.stopPropagation();
+    //     if (e.target.id === clickTargetID && clickTargetID === "modal-article") {
+    //         closeAlert();
+    //     }
+    //     clickTargetID = null;
+    // };
 
     useEffect(() => {
         duration && setTimeout(() => {
-            console.log('cerrar');
             closeAlert()
         }, duration);
         // eslint-disable-next-line
@@ -38,13 +37,13 @@ const MatchAlerts = ({ isOpen, closeAlert, props = false }) => {
 
 
     return (
-        <article className={`mAlert-container mAlert-${type} ${isOpen && 'mA-open'}`}
-            onMouseDown={handleOnMouseDown}
-            onMouseUp={handleOnMouseUp}
+        <article className={`mAlert-container ${isOpen && 'mA-open'}`}
+            // onMouseDown={handleOnMouseDown}
+            // onMouseUp={handleOnMouseUp}
             id="modal-article" >
-            <div className={`mAlert-content`}
+            <div className={`mAlert-content mAlert-${type}`}
                 onClick={handleModalContainerClick} >
-                {type || ''}
+                {message || ''}
             </div>
         </article>
     )

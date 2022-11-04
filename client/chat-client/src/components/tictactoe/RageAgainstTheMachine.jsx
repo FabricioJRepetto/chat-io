@@ -135,34 +135,51 @@ const RageAgainstTheMachine = () => {
                     player ? score.player += 1 : score.bot += 1
                     return score
                 })
-                setTimeout(() => {
-                    if ((player ? score.player : score.bot) >= winCon) {
-                        //: winning style setter
-                        setWinStyle(() => {
-                            return { ...win, backgroundColor: `${player ? '#37668d' : '#F65265'}` }
-                        })
-                        setTimeout(() => {
-                            alert(player ? 'You WIN!' : 'You LOSE...')
-                            resetBoard(true, player ? false : myId)
-                        }, 1000);
-                    } else {
-                        //: winning style setter
-                        setWinStyle(() => {
-                            return { ...win, backgroundColor: `${player ? '#37668d' : '#F65265'}` }
-                        })
-                        setTimeout(() => {
-                            alert(player ? 'You win this round!' : 'You lose this round...')
-                            resetBoard(false, player ? false : myId)
-                        }, 1000);
-                    }
-                }, 1000)
+                if ((player ? score.player : score.bot) >= winCon) {
+                    //: winning style setter
+                    setWinStyle(() => {
+                        return { ...win, backgroundColor: `${player ? '#37668d' : '#F65265'}` }
+                    })
+
+                    //? ALERTA
+                    setTimeout(() => {
+                        openAlert({ type: player ? 'finalW' : 'finalL', message: player ? 'You WIN!' : 'You LOSE...', duration: 2000 })
+                    }, 750);
+
+
+                    //! reset
+                    setTimeout(() => {
+                        resetBoard(true, player ? false : myId)
+                    }, 2000);
+                } else {
+                    //: winning style setter
+                    setWinStyle(() => {
+                        return { ...win, backgroundColor: `${player ? '#37668d' : '#F65265'}` }
+                    })
+
+                    //? ALERTA
+                    setTimeout(() => {
+                        openAlert({ type: player ? 'win' : 'lose', message: player ? 'You win this round!' : 'You lose this round...', duration: 2000 })
+                    }, 750);
+
+                    //! reset
+                    setTimeout(() => {
+                        resetBoard(false, player ? false : myId)
+                    }, 2000);
+                }
                 return
             } else if (turn > 8) {
+                setWaiting(true)
+
+                //? ALERT    
                 setTimeout(() => {
-                    setWaiting(true)
-                    alert('Draw!')
+                    openAlert({ type: 'draw', message: 'DRAW!', duration: 2000 })
+                }, 750);
+
+                //! reset
+                setTimeout(() => {
                     resetBoard(false, player ? false : myId)
-                }, 1000)
+                }, 2000)
                 return
             } else if (player) setPlayerTurn(false)
             else setPlayerTurn(myId)
@@ -207,7 +224,6 @@ const RageAgainstTheMachine = () => {
         <>
             {playing
                 ? <div className='playing'>
-                    <button onClick={() => openAlert({ type: 'DRAW!', duration: false })}>test modal</button>
                     <MatchHeader
                         sign={sign}
                         score={score}
