@@ -3,9 +3,11 @@ import { useEffect } from 'react'
 import { useCon } from '../../context'
 import Board from './Board'
 import { MatchHeader } from './MatchHeader'
-// import { botPlays } from './utils/bot'
 import { checkLine } from './utils/checkLine'
 import SelectMenu from './utils/SelectMenu'
+import { useAlerts } from './utils/useAlerts'
+import MatchAlerts from './MatchAlerts'
+
 
 const RageAgainstTheMachine = () => {
     const { state: { myId } } = useCon()
@@ -18,6 +20,9 @@ const RageAgainstTheMachine = () => {
     const [sign, setSign] = useState('X')
     const [winCon, setWinCon] = useState(3)
     const [winStyle, setWinStyle] = useState(false)
+
+    //? ALERTAS
+    const [isOpen, openAlert, closeAlert, props] = useAlerts();
 
     //? TABLERO
     const [row0, setRow0] = useState([null, null, null])
@@ -202,6 +207,7 @@ const RageAgainstTheMachine = () => {
         <>
             {playing
                 ? <div className='playing'>
+                    <button onClick={() => openAlert({ type: 'DRAW!', duration: false })}>test modal</button>
                     <MatchHeader
                         sign={sign}
                         score={score}
@@ -231,6 +237,11 @@ const RageAgainstTheMachine = () => {
 
                     <p className='p-txt menu-opt' onClick={start}>START</p>
                 </div>}
+
+            <MatchAlerts
+                isOpen={isOpen}
+                closeAlert={closeAlert}
+                props={props} />
         </>
     )
 }
