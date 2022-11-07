@@ -17,6 +17,7 @@ import './App.css'
 const socket = io(BACK_URL)
 
 function App() {
+    const [hint, setHint] = useState(false)
     const [loading, setLoading] = useState(true)
     const { dispatch,
         state: {
@@ -129,6 +130,14 @@ function App() {
     }
 
     useEffect(() => {
+        loading && setTimeout(() => {
+            setHint(true)
+        }, 4000);
+        // eslint-disable-next-line
+    }, [])
+
+
+    useEffect(() => {
         socket.on('newConnection', (c) => handleNewConnection(c))
         socket.on('connectionsUpdate', (u) => handleConnectionsUpdate(u))
         socket.on('DMisTyping', (data) => handleDMTyping(data))
@@ -164,7 +173,13 @@ function App() {
             <Routes>
                 <Route path="/" element={
                     <div>{loading
-                        ? <h2>connecting to server</h2>
+                        ? <>
+                            <h2>connecting to server</h2>
+                            {hint && <>
+                                <p>This may take a few seconds</p>
+                                <p>{`don't worry :)`}</p>
+                            </>}
+                        </>
                         : <>
                             {!logged
                                 ? <>

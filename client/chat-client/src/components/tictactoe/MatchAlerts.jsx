@@ -1,8 +1,10 @@
 import { useEffect } from "react";
+import { useNavigate } from 'react-router-dom'
 
 import "../styles/MatchAlerts.css";
 
 const MatchAlerts = ({ isOpen, closeAlert, props = false }) => {
+    const navigate = useNavigate()
 
     const {
         type,
@@ -41,9 +43,15 @@ const MatchAlerts = ({ isOpen, closeAlert, props = false }) => {
             // onMouseDown={handleOnMouseDown}
             // onMouseUp={handleOnMouseUp}
             id="modal-article" >
-            <div className={`mAlert-content mAlert-${type}`}
-                onClick={handleModalContainerClick} >
-                {message || ''}
+            <div className="mAlert-body">
+                {isOpen && <div className={`mAlert-content mAlert-${type}`}
+                    onClick={handleModalContainerClick} >
+                    {message || ''}
+                    {/final/g.test(type) && <div className="alert-buttons">
+                        <button onClick={closeAlert}>Play again</button>
+                        <button onClick={() => navigate('/')}>Leave</button>
+                    </div>}
+                </div>}
             </div>
         </article>
     )

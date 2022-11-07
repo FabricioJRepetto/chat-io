@@ -22,7 +22,7 @@ const RageAgainstTheMachine = () => {
     const [winStyle, setWinStyle] = useState(false)
 
     //? ALERTAS
-    const [isOpen, openAlert, closeAlert, props] = useAlerts();
+    const [isOpen, openAlert, closeAlert, props] = useAlerts()
 
     //? TABLERO
     const [row0, setRow0] = useState([null, null, null])
@@ -62,7 +62,6 @@ const RageAgainstTheMachine = () => {
                         setRow0(curr => {
                             aux = [...curr]
                             aux.splice(c, 1, auxSign)
-                            player || console.log('aux: ', aux);
                             return aux
                         })
                         //? agrego movimiento del player/bot
@@ -77,7 +76,6 @@ const RageAgainstTheMachine = () => {
                         setRow1(curr => {
                             aux = [...curr]
                             aux.splice(c, 1, auxSign)
-                            player || console.log('aux: ', aux);
                             return aux
                         })
                         B.push(c)
@@ -90,7 +88,6 @@ const RageAgainstTheMachine = () => {
                         setRow2(curr => {
                             aux = [...curr]
                             aux.splice(c, 1, auxSign)
-                            player || console.log('aux: ', aux);
                             return aux
                         })
                         C.push(c)
@@ -129,13 +126,13 @@ const RageAgainstTheMachine = () => {
             if (win) {
                 setWaiting(true)
 
-                let score = {}
                 setScore(prev => {
-                    score = { ...prev }
+                    let score = { ...prev }
                     player ? score.player += 1 : score.bot += 1
                     return score
                 })
-                if ((player ? score.player : score.bot) >= winCon) {
+
+                if ((player ? score.player : score.bot) >= (winCon - 1)) {
                     //: winning style setter
                     setWinStyle(() => {
                         return { ...win, backgroundColor: `${player ? '#37668d' : '#F65265'}` }
@@ -143,7 +140,7 @@ const RageAgainstTheMachine = () => {
 
                     //? ALERTA
                     setTimeout(() => {
-                        openAlert({ type: player ? 'finalW' : 'finalL', message: player ? 'You WIN!' : 'You LOSE...', duration: 2000 })
+                        openAlert({ type: player ? 'finalW' : 'finalL', message: player ? 'You WIN!' : 'You LOSE...' })
                     }, 750);
 
 
@@ -159,7 +156,7 @@ const RageAgainstTheMachine = () => {
 
                     //? ALERTA
                     setTimeout(() => {
-                        openAlert({ type: player ? 'win' : 'lose', message: player ? 'You win this round!' : 'You lose this round...', duration: 2000 })
+                        openAlert({ type: player ? 'win' : 'lose', message: player ? 'Round won!' : 'Round lost..', duration: 1700 })
                     }, 750);
 
                     //! reset
@@ -173,7 +170,7 @@ const RageAgainstTheMachine = () => {
 
                 //? ALERT    
                 setTimeout(() => {
-                    openAlert({ type: 'draw', message: 'DRAW!', duration: 2000 })
+                    openAlert({ type: 'draw', message: 'DRAW', duration: 1700 })
                 }, 750);
 
                 //! reset
@@ -224,6 +221,7 @@ const RageAgainstTheMachine = () => {
         <>
             {playing
                 ? <div className='playing'>
+                    <button onClick={() => openAlert({ type: 'draw', message: 'DRAW!', duration: 2000 })}>alert</button>
                     <MatchHeader
                         sign={sign}
                         score={score}

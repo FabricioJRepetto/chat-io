@@ -7,6 +7,9 @@ import { checkLine } from './utils/checkLine'
 import UsernameInput from '../UsernameInput'
 import SelectMenu from './utils/SelectMenu'
 import { MatchHeader } from './MatchHeader'
+import { useAlerts } from './utils/useAlerts'
+import MatchAlerts from './MatchAlerts'
+
 import './TicTacToe.css'
 
 const TicTacToe = ({ socket }) => {
@@ -18,6 +21,8 @@ const TicTacToe = ({ socket }) => {
     const [sign, setSign] = useState('O')
     const [winCon, setWinCon] = useState(3)
     const [winStyle, setWinStyle] = useState(false)
+
+    const [isOpen, openAlert, closeAlert, props] = useAlerts()
 
     const [playing, setPlaying] = useState(false)
     const [waiting, setWaiting] = useState(false)
@@ -104,14 +109,23 @@ const TicTacToe = ({ socket }) => {
             }
             //: notifica si gana el originador del movimiento
             if (final) {
+                //? ALERTA
                 setTimeout(() => {
-                    alert(`YOU'RE THE WINNER!`)
+                    openAlert({ type: 'finalW', message: `You're the WINNER!` })
+                }, 750);
+
+                setTimeout(() => {
                     setPlaying(false)
                     resetBoard()
                 }, 1000);
             } else if (roundEnd) {
                 setTimeout(() => {
-                    roundEnd === 'DRAW' ? alert('DRAW') : alert('YOU WIN THIS ROUND!')
+                    roundEnd === 'DRAW'
+                        ? openAlert({ type: 'draw', message: `DRAW`, duration: 1700 })
+                        : openAlert({ type: 'win', message: `Round won!`, duration: 1700 })
+                }, 750);
+
+                setTimeout(() => {
                     resetBoard()
                 }, 1000);
             }
@@ -162,7 +176,10 @@ const TicTacToe = ({ socket }) => {
 
         if (final) {
             setTimeout(() => {
-                alert(`THE WINNER IS ${otherPlayer.current.name}`)
+                openAlert({ type: 'finalL', message: `the winner is ${otherPlayer.current.name.toUpperCase()}` })
+            }, 750);
+
+            setTimeout(() => {
                 setPlaying(false)
                 resetBoard()
             }, 1000);
@@ -171,7 +188,10 @@ const TicTacToe = ({ socket }) => {
 
         if (roundEnd) {
             setTimeout(() => {
-                alert(roundEnd)
+                openAlert({ type: 'lose', message: `Round lost`, duration: 1700 })
+            }, 750);
+
+            setTimeout(() => {
                 resetBoard()
             }, 1000);
         }
@@ -209,13 +229,16 @@ const TicTacToe = ({ socket }) => {
         socket.emit('start', { room: roomid, winCon })
     }
     const startHandler = () => {
-        setPlaying(true)
-        alert('Game starts!')
+        openAlert({ type: 'draw', message: 'Game starts!', duration: 1700 })
 
         setUsers(current => {
             setCurrentTurn(() => current[0].id)
             return current
         })
+
+        setTimeout(() => {
+            setPlaying(true)
+        }, 1700);
     }
 
     const continueMatch = ({ rounds, score }) => {
@@ -336,6 +359,11 @@ const TicTacToe = ({ socket }) => {
                         ))
                     }</div>
                     <h3>Room ID: {roomid}</h3>
+
+                    <MatchAlerts
+                        isOpen={isOpen}
+                        closeAlert={closeAlert}
+                        props={props} />
                 </>}
 
         </div>
