@@ -156,7 +156,7 @@ const RageAgainstTheMachine = () => {
 
                     //? ALERTA
                     setTimeout(() => {
-                        openAlert({ type: player ? 'win' : 'lose', message: player ? 'Round won!' : 'Round lost..', duration: 1700 })
+                        openAlert({ type: player ? 'win' : 'lose', message: player ? 'Round won!' : 'Round lost..', duration: 2000 })
                     }, 750);
 
                     //! reset
@@ -170,7 +170,7 @@ const RageAgainstTheMachine = () => {
 
                 //? ALERT    
                 setTimeout(() => {
-                    openAlert({ type: 'draw', message: 'DRAW', duration: 1700 })
+                    openAlert({ type: 'draw', message: 'DRAW', duration: 2000 })
                 }, 750);
 
                 //! reset
@@ -221,7 +221,7 @@ const RageAgainstTheMachine = () => {
         <>
             {playing
                 ? <div className='playing'>
-                    <button onClick={() => openAlert({ type: 'draw', message: 'DRAW!', duration: 2000 })}>alert</button>
+                    <button onClick={() => openAlert({ type: 'finalW' })}>alert</button>
                     <MatchHeader
                         sign={sign}
                         score={score}

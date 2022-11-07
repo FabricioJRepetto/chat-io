@@ -121,8 +121,8 @@ const TicTacToe = ({ socket }) => {
             } else if (roundEnd) {
                 setTimeout(() => {
                     roundEnd === 'DRAW'
-                        ? openAlert({ type: 'draw', message: `DRAW`, duration: 1700 })
-                        : openAlert({ type: 'win', message: `Round won!`, duration: 1700 })
+                        ? openAlert({ type: 'draw', message: `DRAW`, duration: 2000 })
+                        : openAlert({ type: 'win', message: `Round won!`, duration: 2000 })
                 }, 750);
 
                 setTimeout(() => {
@@ -188,7 +188,7 @@ const TicTacToe = ({ socket }) => {
 
         if (roundEnd) {
             setTimeout(() => {
-                openAlert({ type: 'lose', message: `Round lost`, duration: 1700 })
+                openAlert({ type: 'lose', message: `Round lost`, duration: 2000 })
             }, 750);
 
             setTimeout(() => {
@@ -225,11 +225,10 @@ const TicTacToe = ({ socket }) => {
     }
 
     const startMatch = () => {
-        //: setear win condition, mejor de 3 || 5, no joda        
         socket.emit('start', { room: roomid, winCon })
     }
     const startHandler = () => {
-        openAlert({ type: 'draw', message: 'Game starts!', duration: 1700 })
+        openAlert({ type: 'draw', message: 'Game starts!', duration: 2000 })
 
         setUsers(current => {
             setCurrentTurn(() => current[0].id)
@@ -238,7 +237,7 @@ const TicTacToe = ({ socket }) => {
 
         setTimeout(() => {
             setPlaying(true)
-        }, 1700);
+        }, 2000);
     }
 
     const continueMatch = ({ rounds, score }) => {
@@ -248,30 +247,17 @@ const TicTacToe = ({ socket }) => {
     }
 
     const leave = () => {
-        //: se desconecta de la sala
         //? el usuario presiona el boton "abandonar"
-        // socket.emit('leaveRoom', roomid)
         navigate('/')
     }
 
     const disconnect = ({ message }) => {
-        //: se desconecta de la sala
-        //? el otro usuario abandona, 
-        //? el servidor nos dice que nos desconectemos
-        alert(message)
-        // socket.emit('leaveRoom', roomid)
-        navigate('/')
+        //? el otro usuario abandona
+        openAlert({ type: 'lose', message, duration: 2000 })
+        setTimeout(() => {
+            navigate('/')
+        }, 2000);
     }
-
-    // useEffect(() => {
-    //     return () => {
-    //         //: se desconecta de la sala
-    //         //? el usuario cierra la tab, etc., etc.
-    //         socket.emit('leaveRoom', roomid)
-    //     }
-    //     // eslint-disable-next-line
-    // }, [])
-
 
     useEffect(() => {
         //? se conecta a la sala
