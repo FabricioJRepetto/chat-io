@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from 'react-router-dom'
+import { animate } from "./utils/animateStar";
 
 import "../styles/MatchAlerts.css";
 
@@ -28,12 +29,42 @@ const MatchAlerts = ({ isOpen, closeAlert, props = false }) => {
             closeAlert();
         }
         clickTargetID = null;
-    };
+    }
+
+    let index = 0,
+        interval = 1000;
+    const intervals = []
+
+    const stars = () => {
+        for (const star of document.getElementsByClassName('star')) {
+            setTimeout(() => {
+                animate(star)
+                let aux = setInterval(() => animate(star), 1000)
+                intervals.push(aux)
+            }, index++ * (interval / 5))
+        }
+    }
+
+    const clear = () => {
+        intervals.forEach(clearInterval);
+    }
+
+    const playAgain = () => {
+        clear()
+        closeAlert()
+    }
+
+    const leave = () => {
+        clear()
+        navigate('/')
+    }
 
     useEffect(() => {
-        duration && setTimeout(() => {
-            closeAlert()
-        }, duration);
+        duration && setTimeout(() => closeAlert(), duration);
+
+        type === 'finalW' && setTimeout(() => stars(), 1000);
+
+        return () => clear()
         // eslint-disable-next-line
     }, [isOpen])
 
@@ -47,12 +78,29 @@ const MatchAlerts = ({ isOpen, closeAlert, props = false }) => {
                     {isOpen && <div className={`mAF-content mAlert-${type}`}
                         onClick={handleModalContainerClick} >
                         <h3>{type === 'finalW' ? `YOU'RE THE` : 'YOU'}</h3>
-                        <div>{type === 'finalW' ? `WINNER!` : 'LOSE...'}</div>
+
+                        {type === 'finalW'
+                            ? <div className="big-text-w" data-text={`WINNER!`} >
+                                {`WINNER!`}
+                                <span className="star">x</span>
+                                <span className="star">x</span>
+                                <span className="star">x</span>
+                                <span className="star">x</span>
+                                <span className="star">x</span>
+                            </div>
+                            : <div className="big-text-l" data-text={'LOSE...'} >
+                                {'LOSE...'}
+                                <span className="splash1"></span>
+                                <span className="splash2"></span>
+                                <span className="splash3"></span>
+                                <span className="splash4"></span>
+                            </div>}
+
                         <div className="alert-buttons">
-                            <button onClick={closeAlert}>Play again</button>
-                            <button onClick={() => navigate('/')}>Leave</button>
+                            <button onClick={playAgain}>Play again</button>
+                            <button onClick={leave}>Leave</button>
                         </div>
-                        <div className="winner-bg"></div>
+                        <div className={type === 'finalW' ? 'winner-bg' : 'loser-bg'}></div>
                     </div>}
                 </div>
             </article>
