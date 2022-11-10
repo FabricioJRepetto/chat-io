@@ -13,7 +13,7 @@ const RageAgainstTheMachine = () => {
     const { state: { myId } } = useCon()
     const [playing, setPlaying] = useState(false)
     const [waiting, setWaiting] = useState(false)
-    const [playerTurn, setPlayerTurn] = useState(myId)
+    const [playerTurn, setPlayerTurn] = useState(false)
     const [score, setScore] = useState({ player: 0, bot: 0 })
     const [round, setRound] = useState(0)
     const [turn, setTurn] = useState(0)
@@ -208,8 +208,9 @@ const RageAgainstTheMachine = () => {
     }
 
     const start = () => {
-        setWaiting(false)
         setPlaying(true)
+        setWaiting(false)
+        setTimeout(() => setPlayerTurn(myId), 2000)
     }
 
     useEffect(() => {
