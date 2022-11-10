@@ -80,6 +80,7 @@
 }
 
 .menu-opt {
+    user-select: none;
     font-weight: 600;
     font-size: 4rem;
     line-height: 100%;
@@ -92,6 +93,16 @@
 .menu-opt:hover {
     color: var(--red);
 }
+
+.menu-opt-disabled {
+    color: var(--secondary);
+    cursor: default;
+}
+
+.menu-opt-disabled:hover {
+    color: var(--secondary);
+}
+
 
 .room-id-input {
     overflow: hidden;

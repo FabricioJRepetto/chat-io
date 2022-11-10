@@ -49,8 +49,7 @@
     background: linear-gradient(72deg, rgba(0, 0, 0, 0) 15%, var(--blue) 15%, var(--blue) 60%, rgba(0, 0, 0, 0) 60%);
     background-size: 300%, 100%;
     background-position: 100%;
-    animation: alertDefault 2s cubic-bezier(.39, 1.59, .51, .8);
-
+    animation: alertDefault 2s cubic-bezier(.39, 1.59, .51, .8) forwards;
 }
 
 .mAlert-lose {
@@ -58,18 +57,21 @@
     background: linear-gradient(72deg, rgba(0, 0, 0, 0) 15%, var(--red) 15%, var(--red) 60%, rgba(0, 0, 0, 0) 60%);
     background-size: 300%, 100%;
     background-position: 100%;
-    animation: alertDefault 2s cubic-bezier(.39, 1.59, .51, .8);
-
+    animation: alertDefault 2s cubic-bezier(.39, 1.59, .51, .8) forwards;
 }
 
 .mAlert-draw {
     background: linear-gradient(72deg, rgba(0, 0, 0, 0) 15%, var(--secondary) 15%, var(--secondary) 60%, rgba(0, 0, 0, 0) 60%);
     background-size: 300%, 100%;
     background-position: 100%;
-    animation: alertDefault 2s cubic-bezier(.39, 1.59, .51, .8);
+    animation: alertDefault 2s cubic-bezier(.39, 1.59, .51, .8) forwards;
 }
 
 /* FINALS */
+.final-bg {
+    background-color: var(--black);
+}
+
 .mAF-open {
     visibility: visible;
     opacity: 1;
@@ -103,7 +105,7 @@
 
 .big-text-w:after {
     content: attr(data-text);
-    -webkit-text-stroke: 2rem var(--blue);
+    -webkit-text-stroke: 3.5vw var(--blue);
     color: var(--blue);
     position: absolute;
     left: 50%;
@@ -111,16 +113,20 @@
     z-index: -1;
 }
 
-.big-text-w>.star {
-    position: absolute;
-    font-size: clamp(20px, 5vw, 30px);
+.star {
+    --star-left: -100%;
+    --star-top: -100%;
 
+    position: absolute;
     display: block;
+    opacity: 0;
+    font-size: clamp(20px, 5vw, 30px);
+    /* color: var(--white); */
+    color: white;
+
     left: var(--star-left);
     top: var(--star-top);
 
-    /* opacity: .7; */
-    color: var(--white);
     animation: star-anim 1s forwards;
 }
 
@@ -130,7 +136,7 @@
 
 .big-text-l:after {
     content: attr(data-text);
-    -webkit-text-stroke: 2rem var(--red);
+    -webkit-text-stroke: 3.5vw var(--red);
     color: var(--red);
     position: absolute;
     left: 50%;
@@ -159,21 +165,27 @@
 
 .loser-bg {
     position: absolute;
-    left: 30%;
+    left: 50%;
+    transform: translateX(-50%);
+
     width: 40vw;
+    min-width: 20rem;
     height: 40vw;
+    min-height: 20rem;
+
     border-radius: 50%;
     background-color: var(--red);
     z-index: 24;
-    animation: loser-bg 1.5s forwards cubic-bezier(.39, 1.59, .51, .8);
+
+    animation: loser-bg 1.5s cubic-bezier(.39, 1.59, .51, .8) forwards;
 }
 
 .big-text-l>span {
-    background-color: var(--red);
-    height: 4rem;
-    width: 4rem;
-    border-radius: 2rem;
     position: absolute;
+    background-color: var(--red);
+    height: 4vw;
+    width: 4vw;
+    border-radius: 2vw;
     opacity: 0;
     z-index: -1;
 }
@@ -181,7 +193,7 @@
 .splash1 {
     --h: 2.5;
     top: 50%;
-    left: 30%;
+    left: 30.2%;
     animation: lose-splash ease 4s 1.5s forwards;
 }
 
@@ -219,6 +231,22 @@
     margin: 15px;
 }
 
+/* VERSUS */
+.VS-Alert {
+    animation: alertOpacity 2s ease;
+}
+
+.VS-Alert>span {
+    font-size: clamp(24px, 20vw, 5rem);
+}
+
+.mAlert-loseReverse {
+    font-size: clamp(24px, 7.5vw, 7.5vw);
+    background: linear-gradient(72deg, rgba(0, 0, 0, 0) 15%, var(--red) 15%, var(--red) 60%, rgba(0, 0, 0, 0) 60%);
+    background-size: 300%, 100%;
+    background-position: -50%;
+    animation: alertReverse 2s cubic-bezier(.39, 1.59, .51, .8) forwards;
+}
 
 @keyframes alertOpacity {
     0% {
@@ -258,6 +286,26 @@
     }
 }
 
+@keyframes alertReverse {
+    0% {
+        top: 75%;
+    }
+
+    20% {
+        top: 50%;
+        background-position: -50%;
+    }
+
+    90% {
+        top: 50%;
+        background-position: 100%;
+    }
+
+    100% {
+        top: 15%;
+    }
+}
+
 @keyframes winner {
     0% {
         transform: scale(0)
@@ -290,7 +338,7 @@
 
 @keyframes loser-bg {
     0% {
-        transform: scale(0)
+        transform: scale(0) translateX(-50%)
     }
 
     50% {
@@ -298,13 +346,14 @@
     }
 
     70% {
-        transform: scale(1)
+        transform: scale(1) translateX(-50%)
     }
 }
 
 @keyframes star-anim {
     0% {
-        transform: scale(0) rotate(0deg)
+        opacity: 1;
+        transform: scale(0) rotate(0deg);
     }
 
     50% {
@@ -312,6 +361,7 @@
     }
 
     100% {
+        opacity: 1;
         transform: scale(0) rotate(90deg)
     }
 }

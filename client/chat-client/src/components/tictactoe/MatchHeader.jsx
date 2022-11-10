@@ -26,24 +26,38 @@ export const MatchHeader = (props) => {
     }, [users])
 
     return (
-        <div className='header-container'>
-            {users
-                ? <>
-                    <div className='header-txt your-score'>{
-                        !loading && `${data.current?.P1.name}: ${score[data.current?.P1.id] || 0}`
-                    }</div>
-                    <div className='header-txt their-score'>{
-                        !loading && `${data.current?.P2.name}: ${score[data.current?.P2.id] || 0}`
-                    }</div>
-                </>
-                : <>
-                    <div className='header-txt your-score'>You: {score.player || 0}</div>
-                    <div className='header-txt their-score'>Bot: {score.bot || 0}</div>
-                </>}
-            <div className='current-round'>{round}</div>
-            <h2>{playerTurn ? 'Your turn!' : `Oponent's turn`}</h2>
-            <div className={`turn-sign ${playerTurn && 'p1-sign'}`}>{sign}</div>
-            <div className={`turn-sign ${playerTurn || 'p2-sign'}`}>{sign === 'X' ? 'O' : 'X'}</div>
-        </div>
+        <>
+            <div className='header-container'>
+                {users
+                    ? <>
+                        <div className='header-txt your-score'>
+                            {!loading && <>
+                                <div>{data.current?.P1.name}</div>
+                                <p>{score[data.current?.P1.id] || 0}</p>
+                            </>}
+                        </div>
+                        <div className='header-txt their-score'>
+                            {!loading && <>
+                                <div>{data.current?.P2.name}</div>
+                                <p>{score[data.current?.P2.id] || 0}</p>
+                            </>}
+                        </div>
+                    </>
+                    : <>
+                        <div className='header-txt your-score'>
+                            <div>You</div>
+                            <p>{score.player || 0}</p>
+                        </div>
+                        <div className='header-txt their-score'>
+                            <div>Bot</div>
+                            <p>{score.bot || 0}</p>
+                        </div>
+                    </>}
+                <div className='current-round'>{round}</div>
+                <div className={`turn-sign ${playerTurn && 'p1-sign'}`}>{sign}</div>
+                <div className={`turn-sign ${playerTurn || 'p2-sign'}`}>{sign === 'X' ? 'O' : 'X'}</div>
+            </div>
+            <p className='header-turn-indicator'>{playerTurn ? 'Your turn!' : `Oponent's turn`}</p>
+        </>
     )
 }

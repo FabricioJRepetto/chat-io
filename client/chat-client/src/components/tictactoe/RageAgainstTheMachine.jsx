@@ -221,8 +221,6 @@ const RageAgainstTheMachine = () => {
         <>
             {playing
                 ? <div className='playing'>
-                    <button onClick={() => openAlert({ type: 'finalW' })}>win</button>
-                    <button onClick={() => openAlert({ type: 'finalL' })}>lose</button>
                     <MatchHeader
                         sign={sign}
                         score={score}

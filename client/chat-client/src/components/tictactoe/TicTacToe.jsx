@@ -25,7 +25,8 @@ const TicTacToe = ({ socket }) => {
     const [isOpen, openAlert, closeAlert, props] = useAlerts()
 
     const [playing, setPlaying] = useState(false)
-    const [waiting, setWaiting] = useState(false)
+    const [menu, setMenu] = useState(true)
+    const [waiting, setWaiting] = useState(true)
     const [turn, setTurn] = useState(1)
     const [currentTurn, setCurrentTurn] = useState(false)
 
@@ -221,23 +222,40 @@ const TicTacToe = ({ socket }) => {
     const userListUpdater = ({ users, message, reset = false }) => {
         console.log(message)
         setUsers(users)
-        if (users.length === 2) otherPlayer.current = users.find(e => e.id !== myId)
+        if (users.length === 2) {
+            setWaiting(false)
+            otherPlayer.current = users.find(e => e.id !== myId)
+        }
     }
 
     const startMatch = () => {
-        socket.emit('start', { room: roomid, winCon })
+        // socket.emit('start', { room: roomid, winCon })
+        otherPlayer.current && socket.emit('start', { room: roomid, winCon })
     }
+
     const startHandler = () => {
-        openAlert({ type: 'draw', message: 'Game starts!', duration: 2000 })
+        setMenu(() => false)
 
         setUsers(current => {
             setCurrentTurn(() => current[0].id)
             return current
         })
 
+        openAlert({
+            type: 'vs',
+            p1: username,
+            p2: otherPlayer.current.name,
+            duration: 2000
+        })
+
+        setTimeout(() => setPlaying(true), 2000);
+
+        setTimeout(() => openAlert({ type: 'draw', message: 'Game starts!', duration: 2000 }), 4100);
+
         setTimeout(() => {
-            setPlaying(true)
-        }, 2000);
+            setMenu(() => true)
+            setWaiting(() => false)
+        }, 6000);
     }
 
     const continueMatch = ({ rounds, score }) => {
@@ -281,8 +299,7 @@ const TicTacToe = ({ socket }) => {
             socket.off('start')
             socket.off('continue')
             socket.off('leaveRoom')
-            //: se desconecta de la sala
-            //? el usuario cierra la tab, etc., etc.
+
             socket.emit('leaveRoom', roomid)
         }
         // eslint-disable-next-line
@@ -291,7 +308,6 @@ const TicTacToe = ({ socket }) => {
 
     return (
         <div>
-            <button onClick={leave}>Leave</button>
             {!logged
                 ? <UsernameInput socket={socket} />
                 : <>
@@ -319,8 +335,8 @@ const TicTacToe = ({ socket }) => {
 
                             </div>
                             : <>
-                                {users.find(u => u.id === myId && u.role === 'owner') &&
-                                    <div className='pvp-menu'>
+                                {users.find(u => u.id === myId && u.role === 'owner')
+                                    ? <div className={`pvp-menu ${menu && 'pvp-menu-visible'}`}>
                                         <SelectMenu
                                             name={'Points to win'}
                                             options={[3, 5]}
@@ -329,22 +345,27 @@ const TicTacToe = ({ socket }) => {
                                         {users.length < 2
                                             ? <p>Waiting for a challenger...</p>
                                             : <p>{users[1].name} has join!</p>}
-                                        <button onClick={startMatch}
-                                            disabled={users.length < 2}>START</button>
-                                    </div>}
+                                        <div className={`p-txt menu-opt ${users.length < 2 && 'menu-opt-disabled'} `} onClick={() => users.length >= 2 ? startMatch() : undefined}>START</div>
+
+                                    </div>
+                                    : <span>Room joined, waiting to start...</span>}
                             </>}
                     </div>
 
-                    <div className='room-user-list'>Usuarios: {
-                        users.length &&
-                        users.map(u => (
-                            <div key={u.id}>
-                                <b onClick={() => console.log(u.id)}>{u.name}</b>
-                                <i>{`(${u.role})`}</i>
-                            </div>
-                        ))
-                    }</div>
-                    <h3>Room ID: {roomid}</h3>
+                    {menu &&
+                        <>
+                            <div className='room-user-list'>Usuarios: {
+                                users.length &&
+                                users.map(u => (
+                                    <div key={u.id}>
+                                        <b onClick={() => console.log(u.id)}>{u.name}</b>
+                                        <i>{`(${u.role})`}</i>
+                                    </div>
+                                ))
+                            }</div>
+                            <button onClick={leave}>Leave</button>
+                            <p>Room ID: {roomid}</p>
+                        </>}
 
                     <MatchAlerts
                         isOpen={isOpen}

@@ -160,14 +160,7 @@ function App() {
     return (
         <div className="App">
             <div className='watermark'>
-                <h1>TicTacToe Beta v1.1</h1>
-                <div className='divscontainer'>
-                    <div className="testdiv color1"></div>
-                    <div className="testdiv color2"></div>
-                    <div className="testdiv color3"></div>
-                    <div className="testdiv color4"></div>
-                    <div className="testdiv color5"></div>
-                </div>
+                <h1>TicTacToe Beta v1.3</h1>
             </div>
 
             <Routes>

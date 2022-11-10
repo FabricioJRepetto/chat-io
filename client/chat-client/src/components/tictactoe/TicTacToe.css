@@ -4,9 +4,6 @@
 }
 
 .board>div {
-    /* display: grid;
-    grid-template-rows: 10rem 10rem 10rem;
-    grid-template-columns: 10rem 10rem 10rem; */
     display: flex;
 }
 
@@ -17,4 +14,10 @@
 .pvp-menu {
     display: flex;
     flex-direction: column;
+    opacity: 0;
+    transition: opacity .5s ease;
+}
+
+.pvp-menu-visible {
+    opacity: 1;
 }

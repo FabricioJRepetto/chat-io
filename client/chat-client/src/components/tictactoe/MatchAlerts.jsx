@@ -10,6 +10,8 @@ const MatchAlerts = ({ isOpen, closeAlert, props = false }) => {
     const {
         type,
         message,
+        p1,
+        p2,
         duration
     } = props
 
@@ -70,7 +72,7 @@ const MatchAlerts = ({ isOpen, closeAlert, props = false }) => {
 
     return (
         /final/g.test(type)
-            ? <article className={`mAlert-container ${isOpen && 'mAF-open'}`}
+            ? <article className={`mAlert-container final-bg ${isOpen && 'mAF-open'}`}
                 onMouseDown={handleOnMouseDown}
                 onMouseUp={handleOnMouseUp}
                 id="modal-article" >
@@ -106,16 +108,19 @@ const MatchAlerts = ({ isOpen, closeAlert, props = false }) => {
             </article>
 
             : <article className={`mAlert-container ${isOpen && 'mA-open'}`} >
-                <div className="mAlert-body">
-                    {isOpen && <div className={`mAlert-content mAlert-${type}`}
-                        onClick={handleModalContainerClick} >
-                        {message || ''}
+                {type === 'vs'
+                    ? <div className="mAlert-body">
+                        {isOpen && <div className="mAlert-content VS-Alert">
+                            <span className="mAlert-win">{p1 || 'Franco'}</span>
+                            <div>VS</div>
+                            <span className="mAlert-loseReverse">{p2 || 'PEPE'}</span>
+                        </div>}
+                    </div>
+                    : <div className="mAlert-body">
+                        {isOpen && <div className={`mAlert-content mAlert-${type}`} >
+                            {message || ''}
+                        </div>}
                     </div>}
-                    {/final/g.test(type) && <div className="alert-buttons">
-                        <button onClick={closeAlert}>Play again</button>
-                        <button onClick={() => navigate('/')}>Leave</button>
-                    </div>}
-                </div>
             </article>
     )
 }

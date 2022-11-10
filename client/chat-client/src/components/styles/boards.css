@@ -52,31 +52,55 @@
 .horizontal-line {
     position: absolute;
     height: 2px;
-    width: 100%;
+    /* width: 100%; */
     background-color: var(--white);
 }
 
 .vertical-line {
     position: absolute;
-    height: 100%;
+    /* height: 100%; */
     width: 2px;
     background-color: var(--white);
 }
 
 .hl1 {
     top: 33.33%;
+    animation: board-h-line 1s cubic-bezier(.17, .67, .52, .99) 1s forwards;
 }
 
 .hl2 {
     top: 66.66%;
+    animation: board-h-line 1s cubic-bezier(.17, .67, .52, .99) 1.4s forwards;
 }
 
 .vl1 {
     left: 33.33%;
+    animation: board-v-line 1s cubic-bezier(.17, .67, .52, .99) 1s forwards;
 }
 
 .vl2 {
     left: 66.66%;
+    animation: board-v-line 1s cubic-bezier(.17, .67, .52, .99) 1.4s forwards;
+}
+
+@keyframes board-h-line {
+    0% {
+        width: 0%
+    }
+
+    100% {
+        width: 100%
+    }
+}
+
+@keyframes board-v-line {
+    0% {
+        height: 0%
+    }
+
+    100% {
+        height: 100%
+    }
 }
 
 .board {
