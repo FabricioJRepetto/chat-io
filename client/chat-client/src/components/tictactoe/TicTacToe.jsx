@@ -5,12 +5,12 @@ import { useCon } from '../../context'
 import Board from './Board'
 import { checkLine } from './utils/checkLine'
 import UsernameInput from '../UsernameInput'
-import SelectMenu from './utils/SelectMenu'
 import { MatchHeader } from './MatchHeader'
 import { useAlerts } from './utils/useAlerts'
 import MatchAlerts from './MatchAlerts'
 
 import './TicTacToe.css'
+import Menu from './Menu'
 
 const TicTacToe = ({ socket }) => {
     const { state: { myId, username, logged } } = useCon()
@@ -24,6 +24,7 @@ const TicTacToe = ({ socket }) => {
 
     const [isOpen, openAlert, closeAlert, props] = useAlerts()
 
+    const [loading, setLoading] = useState(true)
     const [playing, setPlaying] = useState(false)
     const [menu, setMenu] = useState(true)
     const [waiting, setWaiting] = useState(true)
@@ -117,7 +118,7 @@ const TicTacToe = ({ socket }) => {
 
                 setTimeout(() => {
                     setPlaying(false)
-                    resetBoard()
+                    // resetBoard()
                 }, 1000);
             } else if (roundEnd) {
                 setTimeout(() => {
@@ -182,7 +183,7 @@ const TicTacToe = ({ socket }) => {
 
             setTimeout(() => {
                 setPlaying(false)
-                resetBoard()
+                // resetBoard()
             }, 1000);
             return
         }
@@ -230,16 +231,12 @@ const TicTacToe = ({ socket }) => {
 
     const startMatch = () => {
         // socket.emit('start', { room: roomid, winCon })
-        otherPlayer.current && socket.emit('start', { room: roomid, winCon })
+        (otherPlayer.current && !waiting) && socket.emit('start', { room: roomid, winCon })
     }
 
     const startHandler = () => {
         setMenu(() => false)
 
-        setUsers(current => {
-            setCurrentTurn(() => current[0].id)
-            return current
-        })
 
         openAlert({
             type: 'vs',
@@ -255,6 +252,10 @@ const TicTacToe = ({ socket }) => {
         setTimeout(() => {
             setMenu(() => true)
             setWaiting(() => false)
+            setUsers(current => {
+                setCurrentTurn(() => current[0].id)
+                return current
+            })
         }, 6000);
     }
 
@@ -307,13 +308,13 @@ const TicTacToe = ({ socket }) => {
 
 
     return (
-        <div>
+        <div className='compFadeIn'>
             {!logged
                 ? <UsernameInput socket={socket} />
                 : <>
                     <div className='game-container'>
-                        {playing
-                            ? <div className='playing'>
+                        {playing &&
+                            <div className='playing'>
                                 <MatchHeader
                                     sign={sign}
                                     score={score}
@@ -332,44 +333,23 @@ const TicTacToe = ({ socket }) => {
                                     currentTurn={currentTurn}
                                     waiting={waiting}
                                     winStyle={winStyle} />
-
-                            </div>
-                            : <>
-                                {users.find(u => u.id === myId && u.role === 'owner')
-                                    ? <div className={`pvp-menu ${menu && 'pvp-menu-visible'}`}>
-                                        <SelectMenu
-                                            name={'Points to win'}
-                                            options={[3, 5]}
-                                            setOption={setWinCon} />
-
-                                        {users.length < 2
-                                            ? <p>Waiting for a challenger...</p>
-                                            : <p>{users[1].name} has join!</p>}
-                                        <div className={`p-txt menu-opt ${users.length < 2 && 'menu-opt-disabled'} `} onClick={() => users.length >= 2 ? startMatch() : undefined}>START</div>
-
-                                    </div>
-                                    : <span>Room joined, waiting to start...</span>}
-                            </>}
+                            </div>}
                     </div>
 
-                    {menu &&
-                        <>
-                            <div className='room-user-list'>Usuarios: {
-                                users.length &&
-                                users.map(u => (
-                                    <div key={u.id}>
-                                        <b onClick={() => console.log(u.id)}>{u.name}</b>
-                                        <i>{`(${u.role})`}</i>
-                                    </div>
-                                ))
-                            }</div>
-                            <button onClick={leave}>Leave</button>
-                            <p>Room ID: {roomid}</p>
-                        </>}
+                    {!playing && <Menu
+                        users={users}
+                        myId={myId}
+                        leave={leave}
+                        roomid={roomid}
+                        setWinCon={setWinCon}
+                        startMatch={startMatch}
+                        waiting={waiting}
+                        menu={menu} />}
 
                     <MatchAlerts
                         isOpen={isOpen}
                         closeAlert={closeAlert}
+                        reset={resetBoard}
                         props={props} />
                 </>}
 

@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react'
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom"
 import io from 'socket.io-client'
 import { BACK_URL } from './constants'
 import { useCon } from './context'
 import UsernameInput from './components/UsernameInput'
-import MainMenu from './components/MainMenu';
+import MainMenu from './components/MainMenu'
 import DMChat from './components/dmChat/DMChat'
-import TicTacToe from './components/tictactoe/TicTacToe';
-import RageAgainstTheMachine from './components/tictactoe/RageAgainstTheMachine';
+import TicTacToe from './components/tictactoe/TicTacToe'
+import RageAgainstTheMachine from './components/tictactoe/RageAgainstTheMachine'
 // import Contacts from './components/contacts/Contacts'
 // import ChatContainer from './components/ChatContainer'
 
@@ -160,7 +160,7 @@ function App() {
     return (
         <div className="App">
             <div className='watermark'>
-                <h1>TicTacToe Beta v1.3</h1>
+                <h1>TicTacToe Beta v1.5</h1>
             </div>
 
             <Routes>

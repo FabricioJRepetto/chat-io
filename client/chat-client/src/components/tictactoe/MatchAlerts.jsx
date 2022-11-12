@@ -4,7 +4,7 @@ import { animate } from "./utils/animateStar";
 
 import "../styles/MatchAlerts.css";
 
-const MatchAlerts = ({ isOpen, closeAlert, props = false }) => {
+const MatchAlerts = ({ isOpen, closeAlert, reset, props = false }) => {
     const navigate = useNavigate()
 
     const {
@@ -53,6 +53,7 @@ const MatchAlerts = ({ isOpen, closeAlert, props = false }) => {
 
     const playAgain = () => {
         clear()
+        reset()
         closeAlert()
     }
 

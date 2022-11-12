@@ -1,0 +1,41 @@
+.copiable {
+    position: relative;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.tooltip {
+    background-color: #00000030;
+    border-radius: .5rem;
+    padding: .5rem;
+    position: absolute;
+    top: 2rem;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    transition: opacity .2s ease;
+    pointer-events: none;
+}
+
+.copiable:hover span {
+    color: var(--red);
+}
+
+.tooltip-on {
+    opacity: 1;
+    transition: opacity .2s ease;
+}
+
+.copiable svg {
+    position: absolute;
+    top: -.95rem;
+    right: -2.5rem;
+}
+
+.copiable svg path {
+    fill: var(--white);
+}
+
+.copiable:hover svg path {
+    fill: var(--red);
+}

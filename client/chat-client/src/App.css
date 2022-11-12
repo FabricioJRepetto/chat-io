@@ -161,3 +161,21 @@
 .color5 {
     background-color: var(--blue);
 }
+
+.compFadeIn {
+    animation: compFadeIn 1s ease forwards;
+}
+
+@keyframes compFadeIn {
+    0% {
+        opacity: 0
+    }
+
+    33% {
+        opacity: 0
+    }
+
+    100% {
+        opacity: 1
+    }
+}

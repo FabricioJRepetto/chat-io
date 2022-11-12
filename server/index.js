@@ -199,7 +199,17 @@ io.on('connection', (socket) => {
 
         if (rooms[room].score[socket.id] === rooms[room].winCondition) {
             //: final winner
+
+            let aux = {}
+            for (const key of Object.keys(rooms[room].score)) {
+                aux[key] = 0
+            }
+
+            rooms[room].score = { ...aux }
+            rooms[room].rounds = 0
+
             io.to(room).emit('movement', { ...m, final: true })
+            setTimeout(() => socket.emit('roomUpdate', rooms[room]), 2000);
         } else {
             io.to(room).emit('movement', m)
         }

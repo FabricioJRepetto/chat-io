@@ -219,7 +219,7 @@ const RageAgainstTheMachine = () => {
     }, [row0, row1, row2])
 
     return (
-        <>
+        <section className='compFadeIn'>
             {playing
                 ? <div className='playing'>
                     <MatchHeader
@@ -256,7 +256,7 @@ const RageAgainstTheMachine = () => {
                 isOpen={isOpen}
                 closeAlert={closeAlert}
                 props={props} />
-        </>
+        </section>
     )
 }
 
