@@ -14,6 +14,7 @@ import Loading from './components/tictactoe/utils/Loading'
 
 import './App.css'
 import LoadingHints from './components/tictactoe/utils/LoadingHints'
+import { Logo } from './components/Logo'
 
 // se conecta al socket
 const socket = io(BACK_URL)
@@ -21,6 +22,7 @@ const socket = io(BACK_URL)
 function App() {
     const [hint, setHint] = useState(false)
     const [loading, setLoading] = useState(true)
+    const [isLoading, setIsLoading] = useState(true)
     const { dispatch,
         state: {
             users,
@@ -34,7 +36,8 @@ function App() {
     const handleNewConnection = (c) => {
         dispatch({ type: 'usersUpdate', payload: c.usersOnline })
         dispatch({ type: 'setId', payload: c.id })
-        setLoading(false)
+        setIsLoading(false)
+        setTimeout(() => setLoading(false), 500)
     }
 
     const handleConnectionsUpdate = (u) => {
@@ -162,38 +165,35 @@ function App() {
     return (
         <div className="App">
             <div className='watermark'>
-                <h1>TicTacToe Beta v1.5</h1>
+                <h1>TicTacToe Beta v1.6</h1>
             </div>
 
             <Routes>
                 <Route path="/" element={
-                    <div>{loading
-                        ? <>
-                            <div className='loading'>
+                    <div>
+                        <Logo logged={logged} />
+                        {loading
+                            ? <div className={`loading ${!isLoading && 'notLoading'}`}>
                                 <h2>connecting to server <Loading /></h2>
                                 {hint && <LoadingHints />}
                             </div>
-                        </>
-                        : <>
-                            {!logged
-                                ? <>
-                                    <p>Users online: {users.length || 0}</p>
-                                    <UsernameInput socket={socket} />
-                                </>
-                                : <MainMenu />}
+                            : <>
+                                {!logged
+                                    ? <UsernameInput socket={socket} />
+                                    : <MainMenu />}
 
-                            {(chats) &&
-                                Object.entries(chats).map(([k, v]) => (
-                                    v.open &&
-                                    <DMChat key={k + myId}
-                                        user={{ id: k, name: v.name }}
-                                        socket={socket}
-                                        handleSendPrivate={handleSendPrivate}
-                                    />
-                                ))
-                            }
-                        </>
-                    }</div>
+                                {(chats) &&
+                                    Object.entries(chats).map(([k, v]) => (
+                                        v.open &&
+                                        <DMChat key={k + myId}
+                                            user={{ id: k, name: v.name }}
+                                            socket={socket}
+                                            handleSendPrivate={handleSendPrivate}
+                                        />
+                                    ))
+                                }
+                            </>
+                        }</div>
                 } ></Route>
                 <Route path='/ia' element={<RageAgainstTheMachine />}></Route>
                 <Route path='/game/:id' element={<TicTacToe socket={socket} />}></Route>

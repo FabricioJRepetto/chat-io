@@ -306,7 +306,6 @@ const TicTacToe = ({ socket }) => {
         // eslint-disable-next-line
     }, [])
 
-
     return (
         <div className='compFadeIn'>
             {!logged

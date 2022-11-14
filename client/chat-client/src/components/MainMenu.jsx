@@ -15,6 +15,9 @@ const MainMenu = () => {
 
     const openInput = () => {
         setOpen(true)
+        setTimeout(() => {
+            document.getElementById('roomIdInput').focus()
+        }, 400);
     }
 
     const joinRoom = (e) => {
@@ -32,7 +35,7 @@ const MainMenu = () => {
     }, [roomIdInput])
 
     return (
-        <div className='mainmenu-container'>
+        <div className='mainmenu-container compFadeIn'>
             <p className='s-txt'>Play against an evil machine</p>
             <div className='p-txt menu-opt' onClick={() => navigate('/ia')}>START</div>
 
@@ -42,6 +45,7 @@ const MainMenu = () => {
             <div className='p-txt menu-opt' onClick={open ? joinRoom : openInput}>Join</div>
             <form onSubmit={joinRoom} className={`room-id-input ${open && 'room-id-input-open'}`}>
                 <input type="text"
+                    id={'roomIdInput'}
                     placeholder='Enter the room ID'
                     value={roomIdInput}
                     onChange={(e) => setRoomIdInput(e.target.value)} />

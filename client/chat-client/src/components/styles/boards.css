@@ -10,6 +10,8 @@
     height: 30rem;
     width: 30rem;
     pointer-events: none;
+    opacity: 1;
+    transition: opacity 1s ease;
 }
 
 .winningLine {
@@ -81,6 +83,10 @@
 .vl2 {
     left: 66.66%;
     animation: board-v-line 1s cubic-bezier(.17, .67, .52, .99) 1.4s forwards;
+}
+
+.fastLine {
+    animation-duration: .5s;
 }
 
 @keyframes board-h-line {
