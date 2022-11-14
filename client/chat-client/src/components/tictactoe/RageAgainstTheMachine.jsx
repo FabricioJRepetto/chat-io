@@ -255,6 +255,7 @@ const RageAgainstTheMachine = () => {
             <MatchAlerts
                 isOpen={isOpen}
                 closeAlert={closeAlert}
+                reset={resetBoard}
                 props={props} />
         </section>
     )

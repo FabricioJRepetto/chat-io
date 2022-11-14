@@ -8,10 +8,12 @@ import MainMenu from './components/MainMenu'
 import DMChat from './components/dmChat/DMChat'
 import TicTacToe from './components/tictactoe/TicTacToe'
 import RageAgainstTheMachine from './components/tictactoe/RageAgainstTheMachine'
+import Loading from './components/tictactoe/utils/Loading'
 // import Contacts from './components/contacts/Contacts'
 // import ChatContainer from './components/ChatContainer'
 
 import './App.css'
+import LoadingHints from './components/tictactoe/utils/LoadingHints'
 
 // se conecta al socket
 const socket = io(BACK_URL)
@@ -132,7 +134,7 @@ function App() {
     useEffect(() => {
         loading && setTimeout(() => {
             setHint(true)
-        }, 4000);
+        }, 5000);
         // eslint-disable-next-line
     }, [])
 
@@ -167,11 +169,10 @@ function App() {
                 <Route path="/" element={
                     <div>{loading
                         ? <>
-                            <h2>connecting to server</h2>
-                            {hint && <>
-                                <p>This may take a few seconds</p>
-                                <p>{`don't worry :)`}</p>
-                            </>}
+                            <div className='loading'>
+                                <h2>connecting to server <Loading /></h2>
+                                {hint && <LoadingHints />}
+                            </div>
                         </>
                         : <>
                             {!logged

@@ -9,6 +9,7 @@
     user-select: none;
     overflow: hidden;
     opacity: 0;
+    z-index: 10;
     animation: fade-in 1.5s ease .5s forwards;
 }
 
@@ -73,29 +74,29 @@
     max-height: 20vw;
     margin: 0;
     line-height: 75%;
-    /* font-family: 'Fredoka One', cursive; */
-    font-size: clamp(24px, 20vw, 15rem);
-    transform: translate(-50%) rotate(45deg);
+
+    font-size: 10rem;
+    transform: translate(-10rem) rotate(45deg);
     text-justify: center;
     color: var(--white);
     opacity: 0;
-    z-index: 10;
     user-select: none;
+    z-index: -1;
     transition: all .3s ease;
 }
 
 .p1-sign {
-    opacity: 1;
+    opacity: .7;
     top: 0%;
-    left: 20%;
-    transform: rotate(-15deg);
+    left: 40%;
+    transform: translate(-8rem) rotate(-15deg);
 }
 
 .p2-sign {
-    opacity: 1;
+    opacity: .7;
     top: 0%;
     left: 60%;
-    transform: rotate(15deg);
+    transform: translate(0rem) rotate(15deg);
 }
 
 .header-turn-indicator {

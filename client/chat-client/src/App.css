@@ -166,6 +166,12 @@
     animation: compFadeIn 1s ease forwards;
 }
 
+.loading {
+    position: relative;
+    width: 17rem;
+    text-align: left;
+}
+
 @keyframes compFadeIn {
     0% {
         opacity: 0
