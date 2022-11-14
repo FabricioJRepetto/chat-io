@@ -1,4 +1,4 @@
-const BACK_URL = 'http://localhost:4000'
+const BACK_URL = 'https://websocket-project-server.glitch.me'
 // https://websocket-project-server.glitch.me
 // http://localhost:4000
 
