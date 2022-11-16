@@ -30,28 +30,22 @@
     max-width: 80%;
     min-width: 30%;
     text-align: left;
+    color: var(--white);
+    margin: .5em .5em;
+    padding: .2rem .7rem;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    border-radius: 4px;
+}
+
+.notuser-m {
+    background-color: var(--red);
     align-self: flex-start;
-    color: var(--white);
-    background-color: #303030;
-    border-radius: 0 .5rem .5rem 0;
-    margin: none;
-    padding: .2rem .7rem;
 }
 
-.message b {
-    cursor: pointer;
-}
-
-.user-message {
-    max-width: 80%;
-    min-width: 30%;
-    text-align: left;
+.user-m {
+    background-color: var(--blue);
     align-self: flex-end;
-    color: var(--white);
-    background-color: #151f2e;
-    border-radius: .5rem 0 0 .5rem;
-    margin: none;
-    padding: .2rem .7rem;
 }
 
 .sys-message {
@@ -128,9 +122,9 @@
 /* TESTING */
 .watermark {
     position: fixed;
-    bottom: 1rem;
+    bottom: .5rem;
     left: 1rem;
-    font-size: 1rem;
+    font-size: clamp(24px, 10vw, 1rem);
     opacity: .5;
 }
 
@@ -156,14 +150,16 @@
 }
 
 .loading {
+    height: 2rem;
     position: relative;
-    top: 0;
     left: 50%;
     transform: translate(-50%);
-    width: 17rem;
-    text-align: center;
     opacity: 1;
     transition: all .5s ease;
+}
+
+.loading h2 {
+    margin: 0;
 }
 
 .notLoading {

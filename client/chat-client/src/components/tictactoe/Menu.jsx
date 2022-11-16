@@ -2,9 +2,9 @@ import React from 'react'
 import User from '../../assets/User'
 import CopiableText from './utils/CopiableText'
 import SelectMenu from './utils/SelectMenu'
+import Loading from './utils/Loading'
 
 import '../styles/menu.css'
-import Loading from './utils/Loading'
 
 const Menu = (props) => {
     const {
@@ -46,7 +46,9 @@ const Menu = (props) => {
                     </div>
                 </section>
                 : <div className='loading menu-owner'>
-                    Waiting to start <Loading />
+                    <h2>
+                        Waiting to start <Loading />
+                    </h2>
                 </div>}
 
             <section className='menu-footer'>

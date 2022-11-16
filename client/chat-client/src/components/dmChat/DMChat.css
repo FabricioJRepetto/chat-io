@@ -1,13 +1,21 @@
 .dm-chat-body {
     position: fixed;
     bottom: 0;
+    right: 1em;
     display: flex;
     flex-direction: column;
-    max-height: 3em;
+    height: 3rem;
     max-width: 20rem;
     min-width: 20rem;
     background-color: var(--black);
     border: 1px solid var(--white);
+    border-bottom: none;
+    border-radius: .5em .5em 0 0;
+    transition: height .3s ease;
+}
+
+.dm-expanded {
+    height: 30rem;
 }
 
 .dm-header {
@@ -16,31 +24,87 @@
     align-items: center;
     padding: 0em .6em 0em 2em;
     user-select: none;
-    height: 3em;
+    height: 3rem;
 }
 
-.dm-header>button {
-    height: 2em;
-    padding: 0em .5em;
-    background-color: unset;
-}
-
-.dm-header>button:hover {
-    background-color: #FFFFFF20;
+.dm-header div {
+    padding: .5em .5em;
+    border-radius: 4px;
 }
 
 .dm-pointer {
     cursor: pointer;
 }
 
+.chat-expanded {
+    height: 90%;
+}
+
 .dm-chat-content {
     display: flex;
     flex-direction: column;
+    height: 86%;
+    min-height: 86%;
+    max-height: 86%;
+    overflow-y: scroll;
 }
 
-.dm-expanded {
-    height: 30rem;
-    max-height: 30rem;
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #00000000;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--secondary);
+    width: 4px;
+    padding: 0 2px;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--white);
+}
+
+.chat-bottom {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    min-height: 14%;
+    max-height: 14%;
+
+}
+
+.chat-bottom>p {
+    height: .7rem;
+    top: 2em;
+}
+
+.chat-bottom form {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.chat-bottom input {
+    width: calc(100% - 50px - 1em);
+    margin-bottom: 4px;
+    padding-left: 1rem;
+    text-align: left;
+}
+
+.chat-bottom form button {
+    all: unset;
+    position: relative;
+    height: 40px;
+    width: 40px;
+    cursor: pointer;
+    border-radius: 50%;
+}
+
+.chat-bottom form button:focus {
+    outline: 0;
 }
 
 .dm-unseen {
@@ -49,10 +113,12 @@
 
 @keyframes unseen {
     0% {
-        border: 1px solid orange
+        border: 1px solid orange;
+        border-bottom: none;
     }
 
     100% {
-        border: 1px solid transparent
+        border: 1px solid transparent;
+        border-bottom: none;
     }
 }
