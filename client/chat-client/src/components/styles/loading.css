@@ -19,3 +19,19 @@
 .hint-on {
     top: -1rem;
 }
+
+.dots {
+    user-select: none;
+    position: relative;
+}
+
+.dots>b {
+    opacity: 0;
+}
+
+.dots>p {
+    position: absolute;
+    top: -2px;
+    left: 2px;
+    margin: 0;
+}

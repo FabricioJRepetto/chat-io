@@ -4,6 +4,7 @@ import CopiableText from './utils/CopiableText'
 import SelectMenu from './utils/SelectMenu'
 
 import '../styles/menu.css'
+import Loading from './utils/Loading'
 
 const Menu = (props) => {
     const {
@@ -31,8 +32,8 @@ const Menu = (props) => {
                 </div>
             </section>
 
-            {users.find(u => u.id === myId && u.role === 'owner') &&
-                <section className='menu-owner'>
+            {users.find(u => u.id === myId && u.role === 'owner')
+                ? <section className='menu-owner'>
                     <SelectMenu
                         name={'Points to win'}
                         options={[3, 5]}
@@ -43,9 +44,12 @@ const Menu = (props) => {
                         onClick={() => users.length >= 2 ? startMatch() : undefined}>
                         START
                     </div>
-                </section>}
+                </section>
+                : <div className='loading menu-owner'>
+                    Waiting to start <Loading />
+                </div>}
 
-            <section>
+            <section className='menu-footer'>
                 <button onClick={leave}>Leave</button>
                 <CopiableText text={`${roomid}`} />
             </section>

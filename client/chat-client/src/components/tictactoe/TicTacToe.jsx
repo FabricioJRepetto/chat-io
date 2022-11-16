@@ -1,5 +1,4 @@
-import React, { useState, useRef } from 'react'
-import { useEffect } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useCon } from '../../context'
 import Board from './Board'
@@ -8,12 +7,21 @@ import UsernameInput from '../UsernameInput'
 import { MatchHeader } from './MatchHeader'
 import { useAlerts } from './utils/useAlerts'
 import MatchAlerts from './MatchAlerts'
-
-import './TicTacToe.css'
 import Menu from './Menu'
 
+import './TicTacToe.css'
+import DMChat from '../dmChat/DMChat'
+
 const TicTacToe = ({ socket }) => {
-    const { state: { myId, username, logged } } = useCon()
+    const { dispatch,
+        state: {
+            myId,
+            username,
+            logged,
+            chat,
+            chatConfig }
+    } = useCon()
+
     const { id: roomid } = useParams()
     const navigate = useNavigate()
     const [users, setUsers] = useState([])
@@ -24,7 +32,7 @@ const TicTacToe = ({ socket }) => {
 
     const [isOpen, openAlert, closeAlert, props] = useAlerts()
 
-    const [loading, setLoading] = useState(true)
+    // const [loading, setLoading] = useState(true)
     const [playing, setPlaying] = useState(false)
     const [menu, setMenu] = useState(true)
     const [waiting, setWaiting] = useState(true)
@@ -278,6 +286,35 @@ const TicTacToe = ({ socket }) => {
         }, 2000);
     }
 
+    const sendMessege = ({ message, to }) => {
+        if (message && to) {
+            socket.emit('privateMessage', {
+                message,
+                to
+            })
+        }
+    }
+
+    const handleNewMessage = (m) => {
+        try {
+            // console.log(m.from.name, m.message);
+            let newM = { name: m.from.name, user: m.from.id, message: m.message }
+            dispatch({ type: 'messages', payload: newM })
+
+            !chatConfig.expanded && dispatch({ type: 'chatUpdate', payload: { unseen: true } })
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
+    const isTyping = () => {
+        dispatch({ type: 'chatUpdate', payload: { typing: true } })
+    }
+
+    const stopTyping = () => {
+        dispatch({ type: 'chatUpdate', payload: { typing: false } })
+    }
+
     useEffect(() => {
         //? se conecta a la sala
         logged && socket.emit('TTTRoom', roomid)
@@ -293,6 +330,10 @@ const TicTacToe = ({ socket }) => {
         socket.on('continue', (data) => continueMatch(data))
         socket.on('leaveRoom', (data) => disconnect(data))
 
+        socket.on('DMisTyping', () => isTyping())
+        socket.on('DMStopTyping', () => stopTyping())
+        socket.on('privateMessage', (data) => handleNewMessage(data))
+
         return () => {
             socket.off('roomUpdate')
             socket.off('roomUsersUpdate')
@@ -301,7 +342,12 @@ const TicTacToe = ({ socket }) => {
             socket.off('continue')
             socket.off('leaveRoom')
 
+            socket.off('DMisTyping')
+            socket.off('DMStopTyping')
+            socket.off('privateMessage')
+
             socket.emit('leaveRoom', roomid)
+            dispatch({ type: 'resetChat' })
         }
         // eslint-disable-next-line
     }, [])
@@ -335,21 +381,27 @@ const TicTacToe = ({ socket }) => {
                             </div>}
                     </div>
 
-                    {!playing && <Menu
-                        users={users}
-                        myId={myId}
-                        leave={leave}
-                        roomid={roomid}
-                        setWinCon={setWinCon}
-                        startMatch={startMatch}
-                        waiting={waiting}
-                        menu={menu} />}
+                    {!playing &&
+                        <Menu
+                            users={users}
+                            myId={myId}
+                            leave={leave}
+                            roomid={roomid}
+                            setWinCon={setWinCon}
+                            startMatch={startMatch}
+                            waiting={waiting}
+                            menu={menu} />}
 
                     <MatchAlerts
                         isOpen={isOpen}
                         closeAlert={closeAlert}
                         reset={resetBoard}
                         props={props} />
+
+                    {otherPlayer.current && <DMChat
+                        user={{ id: roomid, name: otherPlayer.current.name }}
+                        socket={socket}
+                        handleSendPrivate={sendMessege} />}
                 </>}
 
         </div>

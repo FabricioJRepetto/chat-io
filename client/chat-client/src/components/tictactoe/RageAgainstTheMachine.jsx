@@ -1,5 +1,4 @@
-import React, { useState, useRef } from 'react'
-import { useEffect } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { useCon } from '../../context'
 import Board from './Board'
 import { MatchHeader } from './MatchHeader'

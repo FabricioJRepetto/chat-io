@@ -7,11 +7,22 @@ function contextReducer(state, action) {
         case 'usersUpdate': {
             return { ...state, users: action.payload }
         }
-        case 'newInbox': {
-            return { ...state, inboxes: action.payload }
+        case 'messages': {
+            return { ...state, chat: [...state.chat, action.payload] }
         }
         case 'chatUpdate': {
-            return { ...state, chats: action.payload }
+            return { ...state, chatConfig: { ...state.chatConfig, ...action.payload } }
+        }
+        case 'resetChat': {
+            return {
+                ...state,
+                chat: [],
+                chatConfig: {
+                    expanded: false,
+                    unseen: false,
+                    typing: false
+                }
+            }
         }
         case 'setUsername': {
             return { ...state, username: action.payload }
@@ -33,8 +44,12 @@ function ContextProvider({ children }) {
         contextReducer,
         {
             users: [],
-            inboxes: new Map(),
-            chats: {},
+            chat: [],
+            chatConfig: {
+                expanded: false,
+                unseen: false,
+                typing: false
+            },
             username: '',
             myId: '',
             logged: false

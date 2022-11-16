@@ -5,16 +5,16 @@ import { BACK_URL } from './constants'
 import { useCon } from './context'
 import UsernameInput from './components/UsernameInput'
 import MainMenu from './components/MainMenu'
-import DMChat from './components/dmChat/DMChat'
+// import DMChat from './components/dmChat/DMChat'
 import TicTacToe from './components/tictactoe/TicTacToe'
 import RageAgainstTheMachine from './components/tictactoe/RageAgainstTheMachine'
 import Loading from './components/tictactoe/utils/Loading'
 // import Contacts from './components/contacts/Contacts'
 // import ChatContainer from './components/ChatContainer'
+import { Logo } from './components/Logo'
+import LoadingHints from './components/tictactoe/utils/LoadingHints'
 
 import './App.css'
-import LoadingHints from './components/tictactoe/utils/LoadingHints'
-import { Logo } from './components/Logo'
 
 // se conecta al socket
 const socket = io(BACK_URL)
@@ -25,9 +25,6 @@ function App() {
     const [isLoading, setIsLoading] = useState(true)
     const { dispatch,
         state: {
-            users,
-            inboxes,
-            chats,
             myId,
             logged
         }
@@ -75,64 +72,64 @@ function App() {
     // Al ser una callback e intentar acceder al estado mediante el hook useState
     // obtengo el valor por defecto (sin importar que se haya actualizado antes)
     //? https://stackoverflow.com/questions/57847594/react-hooks-accessing-up-to-date-state-from-within-a-callback       
-    const handleNewInbox = (m) => {
-        try {
-            // si el destinatario soy yo, abro el chat
-            // y agrego el chat al context
-            console.log(myId);
-            if (m.to.id === myId) {
-                let newDmChat = chats
-                if (chats[m.from.id]) {
-                    newDmChat[m.from.id] = {
-                        ...chats[m.from.id],
-                        open: true,
-                        unseen: true
-                    }
-                } else {
-                    newDmChat[m.from.id] = {
-                        name: m.from.name,
-                        open: true,
-                        expanded: false,
-                        unseen: true,
-                        typing: false
-                    }
-                }
+    // const handleNewInbox = (m) => {
+    //     try {
+    //         // si el destinatario soy yo, abro el chat
+    //         // y agrego el chat al context
+    //         console.log(myId);
+    //         if (m.to.id === myId) {
+    //             let newDmChat = chats
+    //             if (chats[m.from.id]) {
+    //                 newDmChat[m.from.id] = {
+    //                     ...chats[m.from.id],
+    //                     open: true,
+    //                     unseen: true
+    //                 }
+    //             } else {
+    //                 newDmChat[m.from.id] = {
+    //                     name: m.from.name,
+    //                     open: true,
+    //                     expanded: false,
+    //                     unseen: true,
+    //                     typing: false
+    //                 }
+    //             }
 
-                dispatch({ type: 'chatUpdate', payload: newDmChat })
-            }
+    //             dispatch({ type: 'chatUpdate', payload: newDmChat })
+    //         }
 
-            let aux = inboxes
-            // si soy el emisor...
-            if (m.from.id === myId) {
-                aux.get(m.to.id).messages.push(m)
-            } else { // si soy el receptor...
-                if (aux.has(m.from.id)) {
-                    aux.get(m.from.id).messages.push(m)
-                } else {
-                    aux.set(m.from.id, { messages: [m], name: m.from.name })
-                }
-            }
+    //         let aux = inboxes
+    //         // si soy el emisor...
+    //         if (m.from.id === myId) {
+    //             aux.get(m.to.id).messages.push(m)
+    //         } else { // si soy el receptor...
+    //             if (aux.has(m.from.id)) {
+    //                 aux.get(m.from.id).messages.push(m)
+    //             } else {
+    //                 aux.set(m.from.id, { messages: [m], name: m.from.name })
+    //             }
+    //         }
 
-            dispatch({ type: 'newInbox', payload: aux })
-        } catch (err) {
-            console.log(err);
-        }
-    }
+    //         dispatch({ type: 'newInbox', payload: aux })
+    //     } catch (err) {
+    //         console.log(err);
+    //     }
+    // }
 
-    const handleDMTyping = ({ id, typing }) => {
-        try {
-            if (chats[id]) {
-                let newDmChat = chats
-                newDmChat[id] = {
-                    ...chats[id],
-                    typing
-                }
-                dispatch({ type: 'chatUpdate', payload: newDmChat })
-            }
-        } catch (err) {
-            console.log(err);
-        }
-    }
+    // const handleDMTyping = ({ id, typing }) => {
+    //     try {
+    //         if (chats[id]) {
+    //             let newDmChat = chats
+    //             newDmChat[id] = {
+    //                 ...chats[id],
+    //                 typing
+    //             }
+    //             dispatch({ type: 'chatUpdate', payload: newDmChat })
+    //         }
+    //     } catch (err) {
+    //         console.log(err);
+    //     }
+    // }
 
     useEffect(() => {
         loading && setTimeout(() => {
@@ -145,17 +142,17 @@ function App() {
     useEffect(() => {
         socket.on('newConnection', (c) => handleNewConnection(c))
         socket.on('connectionsUpdate', (u) => handleConnectionsUpdate(u))
-        socket.on('DMisTyping', (data) => handleDMTyping(data))
-        socket.on('DMStopTyping', (data) => handleDMTyping(data))
-        socket.on('privateMessage', (d) => handleNewInbox(d))
+        // socket.on('DMisTyping', (data) => handleDMTyping(data))
+        // socket.on('DMStopTyping', (data) => handleDMTyping(data))
+        // socket.on('privateMessage', (d) => handleNewInbox(d))
         socket.on('room', (d) => console.log(d))
 
         return () => {
             socket.off('connectionsUpdate')
             socket.off('newConnection')
-            socket.off('privateMessage')
-            socket.off('DMisTyping')
-            socket.off('DMStopTyping')
+            // socket.off('privateMessage')
+            // socket.off('DMisTyping')
+            // socket.off('DMStopTyping')
             socket.off('room')
         }
         // dependencias deben estar vacías según documentación de socket.io
@@ -165,7 +162,7 @@ function App() {
     return (
         <div className="App">
             <div className='watermark'>
-                <h1>TicTacToe Beta v1.6</h1>
+                <h1>TicTacToe Beta v1.7</h1>
             </div>
 
             <Routes>
@@ -181,17 +178,6 @@ function App() {
                                 {!logged
                                     ? <UsernameInput socket={socket} />
                                     : <MainMenu />}
-
-                                {(chats) &&
-                                    Object.entries(chats).map(([k, v]) => (
-                                        v.open &&
-                                        <DMChat key={k + myId}
-                                            user={{ id: k, name: v.name }}
-                                            socket={socket}
-                                            handleSendPrivate={handleSendPrivate}
-                                        />
-                                    ))
-                                }
                             </>
                         }</div>
                 } ></Route>

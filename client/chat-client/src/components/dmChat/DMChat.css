@@ -1,9 +1,36 @@
 .dm-chat-body {
+    position: fixed;
+    bottom: 0;
     display: flex;
     flex-direction: column;
-    border: 1px solid lime;
-    max-height: 2rem;
+    max-height: 3em;
     max-width: 20rem;
+    min-width: 20rem;
+    background-color: var(--black);
+    border: 1px solid var(--white);
+}
+
+.dm-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0em .6em 0em 2em;
+    user-select: none;
+    height: 3em;
+}
+
+.dm-header>button {
+    height: 2em;
+    padding: 0em .5em;
+    background-color: unset;
+}
+
+.dm-header>button:hover {
+    background-color: #FFFFFF20;
+}
+
+.dm-pointer {
+    cursor: pointer;
 }
 
 .dm-chat-content {

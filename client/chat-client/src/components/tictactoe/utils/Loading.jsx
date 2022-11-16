@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useRef } from 'react'
 
-// import '../../styles/loading.css'
+import '../../styles/loading.css'
 
 const Loading = () => {
     const [dots, setDots] = useState('')
@@ -22,7 +22,11 @@ const Loading = () => {
     }, [])
 
     return (
-        <>{dots}</>
+        <span className='dots'>
+            <b>HH</b>
+            <p>{dots}</p>
+        </span>
+
     )
 }
 

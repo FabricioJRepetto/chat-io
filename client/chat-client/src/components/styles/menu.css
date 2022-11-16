@@ -47,11 +47,18 @@
 }
 
 .menu-owner {
-    margin: 4rem;
+    margin: 3rem 0 3rem 0;
 }
 
 .menu-start {
     margin-top: 2rem;
+}
+
+.menu-footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
 }
 
 @keyframes newUser {

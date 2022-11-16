@@ -128,8 +128,10 @@
 /* TESTING */
 .watermark {
     position: fixed;
-    top: 1rem;
+    bottom: 1rem;
     left: 1rem;
+    font-size: 1rem;
+    opacity: .5;
 }
 
 .divscontainer {
@@ -159,7 +161,7 @@
     left: 50%;
     transform: translate(-50%);
     width: 17rem;
-    text-align: left;
+    text-align: center;
     opacity: 1;
     transition: all .5s ease;
 }
