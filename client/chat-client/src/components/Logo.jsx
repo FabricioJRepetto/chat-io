@@ -19,6 +19,7 @@ export const Logo = ({ logged }) => {
         { r: 1, c: 0, s: 't' }
     ])
     const inter = useRef(null)
+    const colors = useRef(null)
 
     useEffect(() => {
         animation()
@@ -74,13 +75,34 @@ export const Logo = ({ logged }) => {
                             return aux
                         })
                         setComplete(true)
+                        setTimeout(() => randomColors(), 1000)
                     }, 1000);
                 } else clear()
             }, 400);
         }, 1800);
     }
 
-    const clear = () => clearInterval(inter.current)
+    const random = (min, max) =>
+        Math.floor(Math.random() * (max - min + 1)) + min
+
+    const randomColors = () => {
+        colors.current = setInterval(() => {
+            const id = `r${random(0, 2)}${random(0, 2)}`,
+                element = document.getElementById(id);
+
+            element.style.color = (random(1, 2) === 2) ? 'var(--red)' : 'var(--blue)'
+            element.style.animation = 'randomFade 1s ease 3s forwards'
+            setTimeout(() => {
+                element.style.color = 'var(--white)'
+                element.style.animation = 'none'
+            }, 4000);
+        }, 4000);
+    }
+
+    const clear = () => {
+        clearInterval(inter.current)
+        clearInterval(colors.current)
+    }
 
     return (
         <div className={`logo-container ${logged && 'logo-small'}`}>
@@ -102,17 +124,17 @@ export const Logo = ({ logged }) => {
                 <div className={`board`}>
                     <div>{
                         row0.map((tile, i) => (
-                            <div key={'r0' + i} className={`tile ${tile && 'logo-font-size'} ${complete && 'logo-font-size'}`}>{tile}</div>
+                            <div key={'r0' + i} id={'r0' + i} className={`tile ${tile && 'logo-font-size'} ${complete && 'logo-font-size'}`}>{tile}</div>
                         ))
                     }</div>
                     <div>{
                         row1.map((tile, i) => (
-                            <div key={'r1' + i} className={`tile ${tile && 'logo-font-size'} ${complete && 'logo-font-size'}`}>{tile}</div>
+                            <div key={'r1' + i} id={'r1' + i} className={`tile ${tile && 'logo-font-size'} ${complete && 'logo-font-size'}`}>{tile}</div>
                         ))
                     }</div>
                     <div>{
                         row2.map((tile, i) => (
-                            <div key={'r2' + i} className={`tile ${tile && 'logo-font-size'} ${complete && 'logo-font-size'}`}>{tile}</div>
+                            <div key={'r2' + i} id={'r2' + i} className={`tile ${tile && 'logo-font-size'} ${complete && 'logo-font-size'}`}>{tile}</div>
                         ))
                     }</div>
                 </div>

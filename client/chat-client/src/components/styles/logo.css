@@ -25,4 +25,11 @@
 
 .logo-font-size {
     font-size: 13rem;
+    transition: color .3s ease;
+}
+
+@keyframes randomFade {
+    100% {
+        color: var(--white)
+    }
 }

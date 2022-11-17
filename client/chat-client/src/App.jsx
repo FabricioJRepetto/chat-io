@@ -62,7 +62,7 @@ function App() {
     return (
         <div className="App">
             <div className='watermark'>
-                <p>TicTacToe Io - Beta v1.8</p>
+                <p>TicTacToe Io - Beta v1.9</p>
             </div>
 
             <Routes>
