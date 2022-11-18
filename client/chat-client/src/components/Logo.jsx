@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useRef } from 'react'
 
 import './styles/logo.css'
+import './styles/boards.css'
 
 export const Logo = ({ logged }) => {
     const [row0, setRow0] = useState([null, null, null])
@@ -124,17 +125,17 @@ export const Logo = ({ logged }) => {
                 <div className={`board`}>
                     <div>{
                         row0.map((tile, i) => (
-                            <div key={'r0' + i} id={'r0' + i} className={`tile ${tile && 'logo-font-size'} ${complete && 'logo-font-size'}`}>{tile}</div>
+                            <div key={'r0' + i} id={'r0' + i} className={`tile ${tile && 'tile-mark-anim'} ${complete && 'logo-font-size'}`}>{tile}</div>
                         ))
                     }</div>
                     <div>{
                         row1.map((tile, i) => (
-                            <div key={'r1' + i} id={'r1' + i} className={`tile ${tile && 'logo-font-size'} ${complete && 'logo-font-size'}`}>{tile}</div>
+                            <div key={'r1' + i} id={'r1' + i} className={`tile ${tile && 'tile-mark-anim'} ${complete && 'logo-font-size'}`}>{tile}</div>
                         ))
                     }</div>
                     <div>{
                         row2.map((tile, i) => (
-                            <div key={'r2' + i} id={'r2' + i} className={`tile ${tile && 'logo-font-size'} ${complete && 'logo-font-size'}`}>{tile}</div>
+                            <div key={'r2' + i} id={'r2' + i} className={`tile ${tile && 'tile-mark-anim'} ${complete && 'logo-font-size'}`}>{tile}</div>
                         ))
                     }</div>
                 </div>

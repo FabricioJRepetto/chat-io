@@ -28,10 +28,11 @@ const UsernameInput = ({ socket }) => {
 
     return (
         <div className='name-input-container'>
-            <h2>What's your name?</h2>
             <form onSubmit={handleUsername}>
+                <label htmlFor="name-input"><h2>What's your name?</h2></label>
                 <input type="text" id='name-input' onChange={e => setInput(e.target.value)} value={input} />
                 <p className='err-txt'>{inputAlert || ''}</p>
+
                 <div className={`p-txt menu-opt `}
                     onClick={handleUsername}>
                     join

@@ -131,4 +131,10 @@
 
 .tile-mark-anim {
     font-size: 8rem;
+    transition: font-size .3s cubic-bezier(.39, 1.59, .51, .8);
+}
+
+.logo-font-size {
+    font-size: 13rem;
+    transition: color .3s ease, font-size .3s cubic-bezier(.39, 1.59, .51, .8);
 }
