@@ -21,6 +21,7 @@ export const Logo = ({ logged }) => {
     ])
     const inter = useRef(null)
     const colors = useRef(null)
+    const lastId = useRef(null)
 
     useEffect(() => {
         animation()
@@ -86,10 +87,18 @@ export const Logo = ({ logged }) => {
     const random = (min, max) =>
         Math.floor(Math.random() * (max - min + 1)) + min
 
+    const randomId = () => {
+        const id = `r${random(0, 2)}${random(0, 2)}`
+
+        if (lastId.current !== id) {
+            lastId.current = id
+            return id
+        } else return randomId()
+    }
+
     const randomColors = () => {
         colors.current = setInterval(() => {
-            const id = `r${random(0, 2)}${random(0, 2)}`,
-                element = document.getElementById(id);
+            const element = document.getElementById(randomId());
 
             element.style.color = (random(1, 2) === 2) ? 'var(--red)' : 'var(--blue)'
             element.style.animation = 'randomFade 1s ease 3s forwards'
@@ -97,7 +106,8 @@ export const Logo = ({ logged }) => {
                 element.style.color = 'var(--white)'
                 element.style.animation = 'none'
             }, 4000);
-        }, 4000);
+
+        }, 2000);
     }
 
     const clear = () => {
