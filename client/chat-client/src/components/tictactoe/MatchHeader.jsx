@@ -27,7 +27,7 @@ export const MatchHeader = (props) => {
     }, [users])
 
     return (
-        <>
+        <div className='header-outer'>
             <div className='header-container'>
                 {users
                     ? <>
@@ -54,11 +54,14 @@ export const MatchHeader = (props) => {
                             <p>{score.bot || 0}</p>
                         </div>
                     </>}
-                <div className='current-round'>{round}</div>
+                <div className='current-round'>
+                    <p>round</p>
+                    <div>{round}</div>
+                </div>
                 <div className={`turn-sign ${playerTurn && 'p1-sign'}`}>{sign}</div>
                 <div className={`turn-sign ${playerTurn || 'p2-sign'}`}>{sign === 'X' ? 'O' : 'X'}</div>
             </div>
             <p className='header-turn-indicator'>{playerTurn ? 'Your turn!' : `Oponent's turn`}</p>
-        </>
+        </div>
     )
 }

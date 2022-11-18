@@ -1,3 +1,11 @@
+.header-outer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 10rem;
+    width: 100vw;
+}
+
 .header-container {
     position: fixed;
     top: 0;
@@ -14,13 +22,6 @@
     opacity: 0;
     z-index: 10;
     animation: fade-in 1.5s ease .5s forwards;
-}
-
-.header-container>h2 {
-    position: absolute;
-    bottom: -3.5rem;
-    left: 50%;
-    transform: translateX(-50%);
 }
 
 .header-txt {
@@ -57,14 +58,19 @@
     left: 50%;
     transform: translateX(-50%);
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
     height: 0rem;
     width: 7rem;
+    padding-bottom: 1rem;
     font-size: 5rem;
     color: var(--black);
     background-color: var(--white);
     animation: grow-up 1s ease 1s forwards;
+}
+
+.current-round p {
+    font-size: 1rem;
 }
 
 .turn-sign {
@@ -103,8 +109,9 @@
 }
 
 .header-turn-indicator {
+    top: 0;
     font-size: 2rem;
-    margin: 1rem 0 2rem 0;
+    margin: 8rem 0;
     line-height: 75%;
     user-select: none;
     opacity: 0;
