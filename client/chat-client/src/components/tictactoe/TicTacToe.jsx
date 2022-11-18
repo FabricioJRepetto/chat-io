@@ -18,7 +18,6 @@ const TicTacToe = ({ socket }) => {
             myId,
             username,
             logged,
-            chat,
             chatConfig }
     } = useCon()
 
@@ -26,7 +25,7 @@ const TicTacToe = ({ socket }) => {
     const navigate = useNavigate()
     const [users, setUsers] = useState([])
     const otherPlayer = useRef(false)
-    const [sign, setSign] = useState('O')
+    const [sign] = useState('O')
     const [winCon, setWinCon] = useState(3)
     const [winStyle, setWinStyle] = useState(false)
 
@@ -49,6 +48,13 @@ const TicTacToe = ({ socket }) => {
 
     //? MOVIMIENTOS DEL JUGADOR
     const MOVES = useRef({ A: [], B: [], C: [] })
+
+    //? se conecta a la sala
+    useEffect(() => {
+        logged && socket.emit('TTTRoom', roomid)
+
+        // eslint-disable-next-line
+    }, [logged])
 
     const tilePicker = ({ r, c }) => {
         setTurn(current => {
@@ -245,7 +251,6 @@ const TicTacToe = ({ socket }) => {
     const startHandler = () => {
         setMenu(() => false)
 
-
         openAlert({
             type: 'vs',
             p1: username,
@@ -314,13 +319,6 @@ const TicTacToe = ({ socket }) => {
     const stopTyping = () => {
         dispatch({ type: 'chatUpdate', payload: { typing: false } })
     }
-
-    useEffect(() => {
-        //? se conecta a la sala
-        logged && socket.emit('TTTRoom', roomid)
-
-        // eslint-disable-next-line
-    }, [logged])
 
     useEffect(() => {
         socket.on('roomUpdate', (data) => roomUpdater(data))
